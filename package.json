@@ -1,0 +1,61 @@
+{
+  "name": "fiber-framework",
+  "version": "0.0.1",
+  "description": "Fiber brings simplicity and scalability to your JS Apps.",
+  "main": "build/fiber.js",
+  "scripts": {
+    "postinstall": "npm run min && npm run doc",
+    "min": "uglifyjs ./build/fiber.js --mangle --source-map ./build/fiber.min.map -o ./build/fiber.min.js",
+    "lint": "eslint fiber.js",
+    "test": "./node_modules/mocha/bin/mocha",
+    "doc": "rm -rf ./docs/doc && mr-doc -s ./src -o ./docs/doc -n 'Fiber' -t 'cayman'",
+    "open-doc": "open -a \"Google Chrome\" docs/doc/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FiberFoundation/Framework.git"
+  },
+  "keywords": [
+    "js",
+    "framework",
+    "virtual dom",
+    "model",
+    "view",
+    "router",
+    "contracts",
+    "ioc",
+    "inversion of control",
+    "di container",
+    "client",
+    "ui"
+  ],
+  "author": "Igor Krimerman <i.m.krimerman@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FiberFoundation/Framework/issues"
+  },
+  "homepage": "https://github.com/FiberFoundation/Framework#readme",
+  "dependencies": {
+    "lodash": "^4.12.0",
+    "ractive": "^0.7.3",
+    "superagent": "^1.8.3"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-concat": "^2.6.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "karma": "^0.13.22",
+    "karma-chai": "^0.1.0",
+    "karma-coverage": "^1.0.0",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-sinon": "^1.0.5",
+    "mocha": "^2.4.5",
+    "mr-doc": "^3.2.1",
+    "mr-doc-theme-cayman": "^1.4.1",
+    "phantomjs-prebuilt": "^2.1.7",
+    "sinon": "^1.17.4",
+    "uglify-js": "^2.6.2"
+  }
+}
