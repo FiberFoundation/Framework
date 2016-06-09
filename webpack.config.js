@@ -5,6 +5,7 @@ var webpack = require('webpack')
   // Webpack plugins
   , UglifyJsPlugin = webpack.optimize.UglifyJsPlugin
   , CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin
+  , HotModuleReplacementPlugin = webpack.HotModuleReplacementPlugin
 
   // Build vars
   , env = args.argv.mode || 'build'
@@ -23,6 +24,10 @@ if (env === 'build') {
   plugins.push(new UglifyJsPlugin({minimize: true}));
 }
 
+// if (env === 'test' || env === 'dev') {
+//   plugins.push(new HotModuleReplacementPlugin({multiStep: true}));
+// }
+
 // Will chunk Framework and vendor into two separate files.
 if (chunkVendor) {
   plugins.push(new CommonsChunkPlugin('vendor', libraryName.toLowerCase() + '.bundle.js'));
@@ -34,7 +39,7 @@ if (chunkVendor) {
  */
 var config = {
   // Source map to use
-  devtool: 'source-map',
+//   devtool: 'source-map',
   // Bundles entry file
   entry: {
     app: __dirname + '/src/Framework.js',
@@ -45,6 +50,7 @@ var config = {
     library: libraryName,
     libraryTarget: 'umd',
     path: outputPath,
+    publicPath: "/bundle/",
     filename: libraryName.toLowerCase() + extension,
     umdNamedDefine: true
   },
@@ -57,11 +63,11 @@ var config = {
   module: {
     loaders: [
       // Code linting
-      {
-        test: /(\.jsx|\.js)$/,
-        loader: 'jscs-loader',
-        exclude: /node_modules/
-      },
+//       {
+//         test: /(\.jsx|\.js)$/,
+//         loader: 'jscs-loader',
+//         exclude: /node_modules/
+//       },
       // ES6 support
       {
         test: /(\.jsx|\.js)$/,

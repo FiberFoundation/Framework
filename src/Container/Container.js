@@ -1,4 +1,4 @@
-import BaseObject from '../Foundation/Object';
+import BaseObject from '../Foundation/Class';
 import Bag from '../Foundation/Bag';
 import * as _ from 'lodash';
 

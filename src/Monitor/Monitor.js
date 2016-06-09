@@ -1,4 +1,4 @@
-import BaseObject from '../Foundation/Object';
+import BaseObject from '../Foundation/Class';
 import Events from '../Events/Events';
 import Log from '../Logger/Log';
 import * as _ from 'lodash';
@@ -146,7 +146,7 @@ export default class Monitor extends BaseObject {
    * @returns {Monitor}
    */
   watchGlobalEvents(object) {
-    var index = this._watchingGlobalEventsOn.indexOf(object);
+    let index = this._watchingGlobalEventsOn.indexOf(object);
     if (! (~ index)) this._watchingGlobalEventsOn.push(object);
     this.fire('watch.events.global:start', object, this);
     return this;
@@ -158,7 +158,7 @@ export default class Monitor extends BaseObject {
    * @returns {Monitor}
    */
   stopWatchingGlobalEvents(object) {
-    var index = this._watchingGlobalEventsOn.indexOf(object);
+    let index = this._watchingGlobalEventsOn.indexOf(object);
     if (~ index) this._watchingGlobalEventsOn.splice(index, 0);
     this.fire('watch.events.globals:stop', object, this);
     return this;
@@ -173,10 +173,10 @@ export default class Monitor extends BaseObject {
   watchMethods(object, methods) {
     if (_.isEmpty(methods)) methods = _.functionsIn(object);
     this._releaseCached(object);
-    var cached = this._createCached(object);
+    let cached = this._createCached(object);
     cached.own = _.functions(object);
-    for (var i = 0; i < methods.length; i ++) {
-      var name = methods[i];
+    for (let i = 0; i < methods.length; i ++) {
+      let name = methods[i];
       cached.methods[name] = object[name];
       object[name] = (function(self, name, object) {
         return function() {
@@ -197,7 +197,7 @@ export default class Monitor extends BaseObject {
    * @return {Monitor}
    */
   stopWatchingMethods(object, methods) {
-    var cached = this._findCached(object);
+    let cached = this._findCached(object);
     if (! cached) return this;
     if (_.isEmpty(methods)) methods = _.keys(cached.methods);
     _.each(methods, function(name) {
@@ -257,7 +257,7 @@ export default class Monitor extends BaseObject {
    * @private
    */
   _firedGlobal(event, object) {
-    for (var i = 0; i < this._watchingGlobalEventsOn.length; i ++) {
+    for (let i = 0; i < this._watchingGlobalEventsOn.length; i ++) {
       if (this._watchingGlobalEventsOn[i].object === object) this._fired.apply(null, arguments);
     }
   }
@@ -274,7 +274,7 @@ export default class Monitor extends BaseObject {
   _notify(type, parameter, args, stack) {
     type = type.toLowerCase();
 
-    var msg = _.template(this.template, {
+    let msg = _.template(this.template, {
       symbol: this.symbols[type],
       type: type,
       action: type === 'event' ? 'triggered' : 'called',
@@ -292,7 +292,7 @@ export default class Monitor extends BaseObject {
    * @private
    */
   _getStackTrace() {
-    if (this.notifies.stackTrace) try {var stack = (new Error).stack;}
+    if (this.notifies.stackTrace) try {let stack = (new Error).stack;}
     catch (e) {}
     return this._prepareStackTrace(stack) || '';
   }
@@ -305,7 +305,7 @@ export default class Monitor extends BaseObject {
    */
   _prepareStackTrace(stackTrace) {
     // jscs:disable validateQuoteMarks
-    var stack = (stackTrace || '').split("\n");
+    let stack = (stackTrace || '').split("\n");
     // jscs:enable validateQuoteMarks
     if (stack.length > 2) {
       stack.shift();
@@ -323,7 +323,7 @@ export default class Monitor extends BaseObject {
    * @private
    */
   _createCached(object) {
-    var prepared = {object: object, methods: {}, own: []};
+    let prepared = {object: object, methods: {}, own: []};
     this._cache.push(prepared);
     return prepared;
   }

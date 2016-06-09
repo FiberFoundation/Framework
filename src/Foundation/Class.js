@@ -1,19 +1,20 @@
 import Events from '../Events/Events';
+import { Classify } from '../Mixins/Extend';
 import * as _ from 'lodash';
 
 /**
- * Fiber Base Object
+ * Fiber Class
  * @class
- * @mixes Events
- * @mixes Access
+ * @extends Events
  **/
-export default class BaseObject {
+export default class Class extends Classify(Events) {
 
   /**
    * Constructs Base Object.
    * @param {Object} [options={}]
    */
   constructor(options = {}) {
+    super();
     this.options = options;
   }
 
@@ -31,7 +32,7 @@ export default class BaseObject {
    * Sets `value` at the given `key`.
    * @param {string} key
    * @param {*} value
-   * @returns {Access}
+   * @returns {Class}
    */
   set(key, value) {
     _.set(this, key, value);
@@ -126,21 +127,16 @@ export default class BaseObject {
    */
   destroy() {
     this.options = null;
-    this.destroyEvents();
+    this.clearEvents();
     return this;
   }
 
   /**
    * Creates new Base Object with the given `options`.
    * @param {Object} options
-   * @returns {BaseObject}
+   * @returns {Class}
    */
   $new(options) {
-    return new BaseObject(options);
+    return new Class(options);
   }
 }
-
-/**
- * Adds Eventing to the Base Object.
- */
-Object.assign(BaseObject.prototype, Events);

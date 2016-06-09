@@ -1,9 +1,10 @@
 import Events from './Events/Events';
-import BaseObject from './Foundation/Object';
+import Class from './Foundation/Class';
 import Log from './Logger/Log';
 import Monitor from './Monitor/Monitor';
 import Bag from './Foundation/Bag';
 import Container from './Container/Container';
+import * as Mixins from './Mixins/Extend';
 
 /**
  * Export Framework.
@@ -12,9 +13,10 @@ import Container from './Container/Container';
  */
 export default {
   Events,
-  Object: BaseObject,
+  Class,
   Bag,
   Log,
   Monitor,
-  Container
+  Container,
+  Mixins
 };

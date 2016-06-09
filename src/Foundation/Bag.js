@@ -1,4 +1,5 @@
-import BaseObject from './Object';
+import Class from './Class';
+import * as _ from 'lodash';
 
 /**
  * Private `items` Symbol.
@@ -9,10 +10,9 @@ const $items$ = Symbol('items');
 /**
  * Fiber Bag
  * @class
- * @extends BaseObject
- * @mixes Events
+ * @extends Class
  */
-export default class Bag extends BaseObject {
+export default class Bag extends Class {
 
   /**
    * Constructs Bag.
@@ -37,7 +37,7 @@ export default class Bag extends BaseObject {
    * Sets `value` at the given `key`.
    * @param {string} key
    * @param {*} value
-   * @returns {Access}
+   * @returns {Bag}
    */
   set(key, value) {
     _.set(this[$items$], key, value);
@@ -111,10 +111,35 @@ export default class Bag extends BaseObject {
   /**
    * Merges object with current items.
    * @param {Object} object
-   * @returns {Access}
+   * @returns {Bag}
    */
   merge(object) {
     return _.merge(this[$items$], object);
+  }
+
+  /**
+   * Traverses each item in a bag.
+   * @param {function(...)} iteratee
+   * @param {Object} [scope]
+   * @returns {Bag}
+   */
+  each(iteratee, scope) {
+    _.each(this[$items$], scope ? iteratee.bind(scope) : iteratee);
+    return this;
+  }
+
+  /**
+   * Transforms each item in a bag.
+   * @param {function(...)} iteratee
+   * @param {Object} [scope]
+   * @returns {Bag}
+   */
+  transform(iteratee, scope) {
+    iteratee = scope ? iteratee.bind(scope) : iteratee
+    for (let key in this[$items$]) {
+      this[$items$][key] = iteratee(this[$items$][key], key, this[$items$]); 
+    }
+    return this;
   }
 
   /**
@@ -132,6 +157,15 @@ export default class Bag extends BaseObject {
   flush() {
     this[$items$] = {};
     return this;
+  }
+
+  /**
+   * Clones bag items.
+   * @param {boolean} [deep=true]
+   * @returns {Object}
+   */
+  clone(deep = true) {
+    return _[deep ? 'cloneDeep' : 'clone'](this[$items$]);
   }
 
   /**

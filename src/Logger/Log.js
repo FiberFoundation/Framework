@@ -1,4 +1,4 @@
-import BaseObject from '../Foundation/Object';
+import Class from '../Foundation/Class';
 import * as _ from 'lodash';
 
 /**
@@ -6,7 +6,7 @@ import * as _ from 'lodash';
  * @type {Object}
  * @mixin
  */
-export let LogConfig = {
+export const LogConfig = {
 
   /**
    * Current log level.
@@ -53,39 +53,29 @@ export let LogConfig = {
  */
 const _api = {
   log: 'log',
-  trace: 'trace',
-  debug: 'debug',
   info: 'info',
   warn: 'warn',
   error: 'error',
+  debug: 'info',
   dir: 'dir',
-  table: 'table',
-  clear: 'clear',
-  count: 'count',
-  assert: 'assert',
-  group: 'group',
-  groupEnd: 'groupEnd',
-  groupCollapsed: 'groupCollapsed',
   time: 'time',
   timeEnd: 'timeEnd',
-  profile: 'profile',
-  profileEnd: 'profileEnd'
+  trace: 'trace',
+  assert: 'assert',
 };
 
 /**
  * Fiber Log.
  * @class
- * @extends {BaseObject}
  * @mixes LogConfig
  **/
-export default class Log extends BaseObject {
+export default class Log {
 
   /**
    * Constructs Log.
    * @param {Object} [options]
    */
   constructor(options) {
-    super(options);
     this._timers = [];
     this._cachedApi = {};
     _.extend(this, LogConfig, options);
@@ -98,8 +88,8 @@ export default class Log extends BaseObject {
    * @param {...args}
    * @returns {*|Log}
    */
-  log() {
-    return this.write.apply(this, [this.level].concat([...arguments]));
+  log(...args) {
+    return this.write.apply(GlobalLog, [this.level].concat(...args));
   }
 
   /**
@@ -107,8 +97,8 @@ export default class Log extends BaseObject {
    * @param {...args}
    * @returns {*|Log}
    */
-  trace() {
-    return this.write.apply(this, ['trace'].concat([...arguments]));
+  trace(...args) {
+    return this.write.apply(this, ['trace'].concat(...args));
   }
 
   /**
@@ -116,8 +106,8 @@ export default class Log extends BaseObject {
    * @param {...args}
    * @returns {*|Log}
    */
-  debug() {
-    return this.write.apply(this, ['debug'].concat([...arguments]));
+  debug(...args) {
+    return this.write.apply(this, ['debug'].concat(...args));
   }
 
   /**
@@ -125,8 +115,8 @@ export default class Log extends BaseObject {
    * @param {...args}
    * @returns {*|Log}
    */
-  info() {
-    return this.write.apply(this, ['info'].concat([...arguments]));
+  info(...args) {
+    return this.write.apply(this, ['info'].concat(...args));
   }
 
   /**
@@ -134,8 +124,8 @@ export default class Log extends BaseObject {
    * @param {...args}
    * @returns {*|Log}
    */
-  warn() {
-    return this.write.apply(this, ['warn'].concat([...arguments]));
+  warn(...args) {
+    return this.write.apply(this, ['warn'].concat(...args));
   }
 
   /**
@@ -143,20 +133,85 @@ export default class Log extends BaseObject {
    * @param {...args}
    * @returns {*|Log}
    */
-  error() {
-    return this.write.apply(this, ['error'].concat([...arguments]));
+  error(...args) {
+    return this.write.apply(this, ['error'].concat(...args));
   }
 
   /**
    * Writes using `writer` function.
    * @param {string} level
-   * @param {...args}
+   * @param {Array|Arguments} args
    * @return {Log}
    */
-  write(level) {
+  write(level, args) {
     level = _.includes(_api, level) ? level : 'log';
     if (! this.isAllowedLevel(level)) return this;
-    return this.callWriter(level, _.drop([...arguments]));
+    return this.callWriter(level, args);
+  }
+
+  /**
+   * Logs using current level.
+   * @param {...args}
+   * @returns {*|Log}
+   */
+  static log(...args) {
+    return GlobalLog.write.apply(GlobalLog, [GlobalLog.level].concat(...args));
+  }
+
+  /**
+   * Logs using `trace` level.
+   * @param {...args}
+   * @returns {*|Log}
+   */
+  static trace(...args) {
+    return GlobalLog.write.apply(GlobalLog, ['trace'].concat(...args));
+  }
+
+  /**
+   * Logs using `debug` level.
+   * @param {...args}
+   * @returns {*|Log}
+   */
+  static debug(...args) {
+    return GlobalLog.write.apply(GlobalLog, ['debug'].concat(...args));
+  }
+
+  /**
+   * Logs using `info` level.
+   * @param {...args}
+   * @returns {*|Log}
+   */
+  static info(...args) {
+    return GlobalLog.write.apply(GlobalLog, ['info'].concat(...args));
+  }
+
+  /**
+   * Logs using `warn` level.
+   * @param {...args}
+   * @returns {*|Log}
+   */
+  static warn(...args) {
+    return GlobalLog.write.apply(GlobalLog, ['warn'].concat(...args));
+  }
+
+  /**
+   * Logs using `error` level.
+   * @param {...args}
+   * @returns {*|Log}
+   */
+  static error(...args) {
+    return GlobalLog.write.apply(GlobalLog, ['error'].concat(...args));
+  }
+
+  /**
+   * Writes using `writer` function.
+   * @param {string} level
+   * @param {Array|Arguments} args
+   * @returns {Log}
+   * @static
+   */
+  static write(level, args) {
+    return GlobalLog.write(level, args);
   }
 
   /**
@@ -168,7 +223,7 @@ export default class Log extends BaseObject {
   callWriter(method, args) {
     method = _.includes(_api, level) ? level : 'log';
     if (! _.isFunction(this._cachedApi[method])) return this;
-    var msg = _.first(args), details = this.renderTemplate({msg: _.isString(msg) ? msg : ''});
+    let msg = _.first(args), details = this.renderTemplate({msg: _.isString(msg) ? msg : ''});
     this._cachedApi[method].apply(null, [details].concat(_.drop(args)));
     return this;
   }
@@ -199,7 +254,7 @@ export default class Log extends BaseObject {
    * @returns {Object}
    */
   getTemplateData(data = {}) {
-    var date = new Date();
+    let date = new Date();
     return _.extend({
       self: this,
       level: this.level,
@@ -228,7 +283,7 @@ export default class Log extends BaseObject {
    * @returns {Log}
    */
   timer(name) {
-    var index = this._timers.indexOf(name), method = ~ index ? 'timeEnd' : 'time';
+    let index = this._timers.indexOf(name), method = ~ index ? 'timeEnd' : 'time';
     if (! (~ index)) this._timers.push(name);
     else this._timers.splice(index, 1);
     return this.callWriter(method, [name]);
@@ -241,10 +296,10 @@ export default class Log extends BaseObject {
    */
   isAllowedLevel(level) {
     if (! level || ! this.levels[level]) return false;
-    var levels = _.values(this.levels)
+    let levels = _.values(this.levels)
       , index = levels.indexOf(level);
     if (index === - 1) return false;
-    var currentLevelIndex = levels.indexOf(this.level);
+    let currentLevelIndex = levels.indexOf(this.level);
     return index >= currentLevelIndex;
   }
 
@@ -254,8 +309,9 @@ export default class Log extends BaseObject {
    * @private
    */
   _cacheConsoleApi() {
-    for (var method in _api)
+    for (let method in _api) {
       this._cachedApi[_api[method]] = _.bind(console[_api[method]], console);
+    }
     return this._cachedApi;
   }
 
@@ -272,3 +328,9 @@ export default class Log extends BaseObject {
     return this;
   }
 }
+
+/**
+ * Global Logger.
+ * @type {Log}
+ */
+export const GlobalLog = new Log();

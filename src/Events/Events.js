@@ -228,14 +228,14 @@ let Events = {
    */
   clearEvents: function(cleanUp = false) {
     this.off();
-    
+
     if (cleanUp) {
       delete this._listeningTo;
       delete this._listeners;
       delete this._listenId;
       delete this._events;
     }
-    
+
     return this;
   },
 
