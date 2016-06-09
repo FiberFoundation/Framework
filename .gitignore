@@ -16,3 +16,6 @@ node_modules
 .npm
 
 .idea
+dist
+docs
+tests/manual/manual.js
