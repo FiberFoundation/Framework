@@ -1,5 +1,5 @@
-import Events from '../../../src/Events/Events';
-import TestSuite from '../../Support/TestSuite';
+import Events from '../../src/Events/Events';
+import TestSuite from '../support/TestSuite';
 import chai from 'chai';
 
 const expect = chai.expect;

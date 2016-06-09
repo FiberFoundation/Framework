@@ -56,17 +56,17 @@ var config = {
   // Modules
   module: {
     loaders: [
-      // ES6 support
-      {
-        test: /(\.jsx|\.js)$/,
-        loader: 'babel',
-        exclude: /(node_modules)/
-      },
       // Code linting
       {
         test: /(\.jsx|\.js)$/,
         loader: 'jscs-loader',
         exclude: /node_modules/
+      },
+      // ES6 support
+      {
+        test: /(\.jsx|\.js)$/,
+        loader: 'babel',
+        exclude: /(node_modules)/
       }
     ]
   },
