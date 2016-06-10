@@ -1,6 +1,6 @@
 {
   "name": "fiber-framework",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Fiber brings simplicity and scalability to your JS Apps.",
   "main": "dist/fiber.js",
   "scripts": {
