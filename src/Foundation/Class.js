@@ -1,5 +1,4 @@
 import Events from '../Events/Events';
-import { Classify } from '../Mixins/Extend';
 import * as _ from 'lodash';
 
 /**
@@ -7,14 +6,14 @@ import * as _ from 'lodash';
  * @class
  * @extends Events
  **/
-export default class Class extends Classify(Events) {
+export default class Class extends Events {
 
   /**
    * Constructs Base Object.
    * @param {Object} [options={}]
    */
   constructor(options = {}) {
-    super();
+    super(options.ns, options.catalog);
     this.options = options;
   }
 
@@ -129,14 +128,5 @@ export default class Class extends Classify(Events) {
     this.options = null;
     this.clearEvents();
     return this;
-  }
-
-  /**
-   * Creates new Base Object with the given `options`.
-   * @param {Object} options
-   * @returns {Class}
-   */
-  $new(options) {
-    return new Class(options);
   }
 }

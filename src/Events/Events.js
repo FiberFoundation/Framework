@@ -6,30 +6,27 @@ import * as _ from 'lodash';
  *
  * Build in events brings namespaces to the event and also
  * provides catalog to simplify registered events and add ability to create event alias.
- * @type {Object}
- * @typedef {Events}
+ * @class
  * @mixin
  */
-let Events = {
+export default class Events {
 
   /**
-   * Events namespace.
-   * @type {string}
+   * Constructs Events.
+   * @param {string} [ns='']
+   * @param {Object} [catalog={}]
    */
-  ns: '',
-
-  /**
-   * Catalog to hold the known or aliased events.
-   * @type {Object}
-   */
-  catalog: {},
+  constructor(ns = '', catalog = {}) {
+    this.ns = ns;
+    this.catalog = catalog;
+  }
 
   /**
    * Returns `event` with namespace and `catalog` look up.
    * @param {string} event
    * @returns {string}
    */
-  event: function(event, listenable = null) {
+  event(event, listenable = null) {
     if (! event) return '';
     if (listenable && _.isFunction(listenable.event)) return listenable.event(event);
     // try to retrieve event from catalog
@@ -38,7 +35,7 @@ let Events = {
     if (event.charAt(0) === '!') return event.slice(1);
     // and lastly join namespace and event string
     return (this.ns ? this.ns + ':' : '') + _.trim(eventName, '.');
-  },
+  }
 
   /**
    * Triggers events with the given arguments.
@@ -46,9 +43,9 @@ let Events = {
    * @param {...args}
    * @returns {Events}
    */
-  trigger: function(event, ...args) {
+  trigger(event, ...args) {
     return Vent.trigger.apply(this, arguments);
-  },
+  }
 
   /**
    * Fires event with namespace and catalog look up.
@@ -56,9 +53,9 @@ let Events = {
    * @param {...args}
    * @returns {Events}
    */
-  fire: function(event, ...args) {
+  fire(event, ...args) {
     return this.trigger.apply(this, [this.event(event)].concat(...args));
-  },
+  }
 
   /**
    * Bind an event to a `listener` function. Passing `"all"` will bind
@@ -68,9 +65,9 @@ let Events = {
    * @param {Object} [scope]
    * @returns {Events}
    */
-  on: function(event, listener, scope) {
+  on(event, listener, scope) {
     return this.when(this, event, listener, scope);
-  },
+  }
 
   /**
    * Bind an event to only be triggered a single time. After the first time
@@ -82,9 +79,9 @@ let Events = {
    * @param {Object} [scope]
    * @returns {Events}
    */
-  once: function(event, listener, scope) {
+  once(event, listener, scope) {
     return this.after(this, event, listener, scope);
-  },
+  }
 
   /**
    * Inversion-of-control versions of `on`. Tells `this` object to listen to
@@ -96,12 +93,12 @@ let Events = {
    * @param {Object} [scope]
    * @returns {Events}
    */
-  when: function(object, event, listener, scope) {
+  when(object, event, listener, scope) {
     if (_.isString(object)) [listener, event, object] = [event, object, this];
     return Vent.listenTo.call(
       this, object, this.event(event, object), this.createEventListener(listener, scope)
     );
-  },
+  }
 
   /**
    * Inversion-of-control versions of `once`.
@@ -111,12 +108,12 @@ let Events = {
    * @param {Object} [scope]
    * @returns {Events}
    */
-  after: function(object, event, listener, scope) {
+  after(object, event, listener, scope) {
     if (_.isString(object)) [listener, event, object] = [event, object, this];
     return Vent.listenToOnce.call(
       this, object, this.event(event, object), this.createEventListener(listener, scope)
     );
-  },
+  }
 
   /**
    * Remove one or many listeners. If `scope` is null, removes all
@@ -129,12 +126,12 @@ let Events = {
    * @param {Object} [scope]
    * @returns {Events}
    */
-  off: function(object, event, listener, scope) {
+  off(object, event, listener, scope) {
     if (_.isString(object)) [listener, event, object] = [event, object, this];
     return Vent.stopListening.call(
       this, object, (event && this.event(event, object) || void 0), this.createEventListener(listener, scope)
     );
-  },
+  }
 
   /**
    * Inversion-of-control versions of `on` that listens to the Global Broadcast.
@@ -144,10 +141,10 @@ let Events = {
    * @param {Object} [scope]
    * @returns {Events}
    */
-  whenBroadcast: function(event, listener, scope) {
+  whenBroadcast(event, listener, scope) {
     Broadcast.when(event, listener, scope);
     return this;
-  },
+  }
 
   /**
    * Inversion-of-control versions of `once` that listens to the Global Broadcast.
@@ -157,10 +154,10 @@ let Events = {
    * @param {Object} [scope]
    * @returns {Events}
    */
-  afterBroadcast: function(event, listener, scope) {
+  afterBroadcast(event, listener, scope) {
     Broadcast.after(event, listener, scope);
     return this;
-  },
+  }
 
   /**
    * Remove one or many listeners from Global Broadcast. If `scope` is null, removes all
@@ -172,10 +169,10 @@ let Events = {
    * @param {Object} [scope]
    * @returns {Events}
    */
-  stopBroadcast: function(event, listener, scope) {
+  stopBroadcast(event, listener, scope) {
     Broadcast.off(event, listener, scope);
     return this;
-  },
+  }
 
   /**
    * Broadcasts global event.
@@ -183,30 +180,30 @@ let Events = {
    * @param {...args}
    * @returns {Events}
    */
-  broadcast: function(event, ...args) {
+  broadcast(event, ...args) {
     Broadcast.fire.apply(Broadcast, arguments);
     return this;
-  },
+  }
 
   /**
    * Returns current Global Broadcast Events object.
    * @returns {Events}
    */
-  getBroadcast: function() {
+  getBroadcast() {
     return Broadcast;
-  },
+  }
 
   /**
    * Sets current Global Broadcast Events object.
    * @param {Events} Broadcaster
    * @returns {Events}
    */
-  setBroadcast: function(Broadcaster) {
+  setBroadcast(Broadcaster) {
     if (Broadcaster.trigger && Broadcaster.when) {
       Broadcast = Broadcaster;
     }
     return this;
-  },
+  }
 
   /**
    * Creates and returns function that will call listener with the right scope.
@@ -214,19 +211,19 @@ let Events = {
    * @param {Object} [scope]
    * @returns {FiberEventListener|void}
    */
-  createEventListener: function(cb, scope) {
+  createEventListener(cb, scope) {
     if (! _.isFunction(cb)) return void 0;
     return function FiberEventListener() {
       return cb.apply(scope || cb.prototype || cb, arguments);
     };
-  },
+  }
 
   /**
    * Unbounds and clears all events.
    * @param {boolean} [cleanUp=false]
    * @returns {Events}
    */
-  clearEvents: function(cleanUp = false) {
+  clearEvents(cleanUp = false) {
     this.off();
 
     if (cleanUp) {
@@ -237,36 +234,26 @@ let Events = {
     }
 
     return this;
-  },
+  }
 
   /**
    * Unbounds and clears all Global events.
    * @param {boolean} [cleanUp]
    * @returns {Events}
    */
-  clearBroadcastEvents: function(cleanUp) {
+  clearBroadcastEvents(cleanUp) {
     Broadcast.clearEvents(cleanUp);
     return this;
-  },
+  }
 
   /**
    * Resets events namespace and catalog to default values.
    * @returns {Events}
    */
-  resetNsAndCatalog: function() {
+  resetNsAndCatalog() {
     this.ns = '';
     this.catalog = {};
     return this;
-  },
-
-  /**
-   * Returns new copy of Events.
-   * You can provide `mixin` argument to mix any object to it.
-   * @param {Object} [mixin={}]
-   * @returns {Events}
-   */
-  $new: function(mixin = {}) {
-    return _.extend({}, mixin, Events);
   }
 };
 
@@ -274,10 +261,4 @@ let Events = {
  * Global Broadcast.
  * @type {Events}
  */
-let Broadcast = Events.$new();
-
-/**
- * Export Events.
- * @type {Events}
- */
-export default Events;
+let Broadcast = new Events();

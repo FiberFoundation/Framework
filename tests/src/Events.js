@@ -7,7 +7,7 @@ const expect = chai.expect;
 var Suite = new TestSuite('Events', function () {
 
   before(function() {
-    this.vent = Events.$new();
+    this.vent = new Events();
   });
 
   beforeEach(function() {
@@ -157,12 +157,12 @@ var Suite = new TestSuite('Events', function () {
   it('`getBroadcast`: should return current global Broadcast Events.', function() {
     var Broadcast = this.vent.getBroadcast();
     Broadcast.clearEvents(true);
-    expect(Broadcast).to.be.eql(Events);
+    expect(Broadcast).to.instanceof(Events);
   });
 
 
   it('`setBroadcast`: should set new global Broadcast Events.', function() {
-    var newBroadcast = Events.$new();
+    var newBroadcast = new Events();
     this.vent.setBroadcast(newBroadcast);
     var Broadcast = this.vent.getBroadcast();
     expect(Broadcast).to.be.equal(newBroadcast);
@@ -214,15 +214,5 @@ var Suite = new TestSuite('Events', function () {
 
     expect(this.vent.ns).to.be.equal('');
     expect(this.vent.catalog).to.be.eql({});
-  });
-
-  it('`$new`: should return new copy of Events.', function() {
-    var newEvents = Events.$new();
-    expect(newEvents).to.be.eql(Events);
-    newEvents = Events.$new({
-      mixin: 'phrase'
-    });
-
-    expect(newEvents).to.be.eql(Object.assign({mixin: 'phrase'}, Events.$new()))
   });
 });

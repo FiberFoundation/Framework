@@ -93,7 +93,7 @@ export function Extend(parent, proto) {
   // Add prototype properties (instance properties) to the subclass, if supplied.
   if (proto) _.extend(child.prototype, proto);
   // Adds _parent_ and _super_ reference for the child.
-  _.extend(child, {_parent_: parent, _super_: child.prototype});
+  _.extend(child, {_parent_: parent, _super_: parent.prototype});
   // and finally return child
   return child;
 };
