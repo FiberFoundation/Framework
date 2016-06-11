@@ -43,7 +43,7 @@ var config = {
   // Bundles entry file
   entry: {
     app: __dirname + '/src/Framework.js',
-    vendor: ['lodash', 'superagent', 'ractive']
+    vendor: ['lodash', 'superagent', 'ractive', 'babel-polyfill']
   },
   // Output configuration
   output: {

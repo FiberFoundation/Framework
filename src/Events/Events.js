@@ -2,28 +2,34 @@ import Vent from './Support';
 import * as _ from 'lodash';
 
 /**
+ * Channels storage.
+ * Manages the private channels data of Events classes.
+ * @type {WeakMap}
+ * @private
+ */
+let Channels = new WeakMap();
+
+/**
  * Fiber Events.
- *
- * Build in events brings namespaces to the event and also
- * provides catalog to simplify registered events and add ability to create event alias.
  * @class
- * @mixin
  */
 export default class Events {
 
   /**
    * Constructs Events.
-   * @param {string} [ns='']
-   * @param {Object} [catalog={}]
+   * @param {{ns: string, catalog: Object}} [options={ns:'',catalog:{}}] - Options object.
    */
-  constructor(ns = '', catalog = {}) {
+  constructor({ns, catalog} = {ns: '', catalog: {}}) {
+    /** @type {string} */
     this.ns = ns;
+    /** @type {Object} */
     this.catalog = catalog;
   }
 
   /**
    * Returns `event` with namespace and `catalog` look up.
    * @param {string} event
+   * @param {Object} [listenable=null]
    * @returns {string}
    */
   event(event, listenable = null) {
@@ -40,7 +46,7 @@ export default class Events {
   /**
    * Triggers events with the given arguments.
    * @param {string} event
-   * @param {...args}
+   * @param {...mixed} args
    * @returns {Events}
    */
   trigger(event, ...args) {
@@ -50,7 +56,7 @@ export default class Events {
   /**
    * Fires event with namespace and catalog look up.
    * @param {string} event
-   * @param {...args}
+   * @param {...mixed} args
    * @returns {Events}
    */
   fire(event, ...args) {
@@ -61,7 +67,7 @@ export default class Events {
    * Bind an event to a `listener` function. Passing `"all"` will bind
    * the listener to all events fired.
    * @param {string} event
-   * @param {function(...)} listener
+   * @param {Function} listener
    * @param {Object} [scope]
    * @returns {Events}
    */
@@ -75,7 +81,7 @@ export default class Events {
    * are passed in using the space-separated syntax, the handler will fire
    * once for each event, not once for a combination of all events.
    * @param {string} event
-   * @param {function(...)} listener
+   * @param {Function} listener
    * @param {Object} [scope]
    * @returns {Events}
    */
@@ -88,8 +94,8 @@ export default class Events {
    * an event in another object... keeping track of what it's listening to
    * for easier unbinding later.
    * @param {Object|Events|string} object
-   * @param {string|function(...)} event
-   * @param {function(...)|Object} listener
+   * @param {string|Function} event
+   * @param {Function|Object} listener
    * @param {Object} [scope]
    * @returns {Events}
    */
@@ -103,8 +109,8 @@ export default class Events {
   /**
    * Inversion-of-control versions of `once`.
    * @param {Object|Events|string} object
-   * @param {string|function(...)} event
-   * @param {function(...)|Object} listener
+   * @param {string|Function} event
+   * @param {Function|Object} listener
    * @param {Object} [scope]
    * @returns {Events}
    */
@@ -121,8 +127,8 @@ export default class Events {
    * listeners for the event. If `name` is null, removes all bound
    * listeners for all events.
    * @param {Object|Events|string} [object]
-   * @param {string|function(...)} [event]
-   * @param {function(...)|Object} [listener]
+   * @param {string|Function} [event]
+   * @param {Function|Object} [listener]
    * @param {Object} [scope]
    * @returns {Events}
    */
@@ -137,7 +143,7 @@ export default class Events {
    * Inversion-of-control versions of `on` that listens to the Global Broadcast.
    * That gives ability to listen to events even if you don't know what object will fire it.
    * @param {string} event
-   * @param {function(...)} listener
+   * @param {Function} listener
    * @param {Object} [scope]
    * @returns {Events}
    */
@@ -150,7 +156,7 @@ export default class Events {
    * Inversion-of-control versions of `once` that listens to the Global Broadcast.
    * That gives ability to listen to events even if you don't know what object will fire it.
    * @param {string} event
-   * @param {function(...)} listener
+   * @param {Function} listener
    * @param {Object} [scope]
    * @returns {Events}
    */
@@ -161,11 +167,10 @@ export default class Events {
 
   /**
    * Remove one or many listeners from Global Broadcast. If `scope` is null, removes all
-   * listeners with that function. If `listener` is null, removes all
-   * listeners for the event. If `name` is null, removes all bound
-   * listeners for all events.
+   * listeners with that function. If `listener` is null, removes all listeners for the event.
+   * If `name` is null, removes all bound listeners for all events.
    * @param {string} event
-   * @param {function(...)} listener
+   * @param {Function} listener
    * @param {Object} [scope]
    * @returns {Events}
    */
@@ -177,7 +182,7 @@ export default class Events {
   /**
    * Broadcasts global event.
    * @param {string} event
-   * @param {...args}
+   * @param {...mixed} args
    * @returns {Events}
    */
   broadcast(event, ...args) {
@@ -186,28 +191,27 @@ export default class Events {
   }
 
   /**
-   * Returns current Global Broadcast Events object.
+   * Creates separate Events channel with the given `name`, if one exists then it will be returned.
+   * @param {string} name
    * @returns {Events}
    */
-  getBroadcast() {
-    return Broadcast;
-  }
+  channel(name) {
+    if (! Channels.has(this)) Channels.set(this, {});
+    let storage = Channels.get(this) || {}
+      , channel = storage[name];
 
-  /**
-   * Sets current Global Broadcast Events object.
-   * @param {Events} Broadcaster
-   * @returns {Events}
-   */
-  setBroadcast(Broadcaster) {
-    if (Broadcaster.trigger && Broadcaster.when) {
-      Broadcast = Broadcaster;
+    if (! (channel instanceof Events)) {
+      channel = new Events();
+      storage[name] = channel;
     }
-    return this;
+
+    Channels.set(this, storage);
+    return channel;
   }
 
   /**
    * Creates and returns function that will call listener with the right scope.
-   * @param {function(...)} cb
+   * @param {Function} cb
    * @param {Object} [scope]
    * @returns {FiberEventListener|void}
    */
@@ -220,18 +224,17 @@ export default class Events {
 
   /**
    * Unbounds and clears all events.
-   * @param {boolean} [cleanUp=false]
    * @returns {Events}
    */
-  clearEvents(cleanUp = false) {
+  destroy() {
     this.off();
 
-    if (cleanUp) {
+    try {
       delete this._listeningTo;
       delete this._listeners;
       delete this._listenId;
       delete this._events;
-    }
+    } catch (e) {}
 
     return this;
   }
@@ -241,8 +244,8 @@ export default class Events {
    * @param {boolean} [cleanUp]
    * @returns {Events}
    */
-  clearBroadcastEvents(cleanUp) {
-    Broadcast.clearEvents(cleanUp);
+  destroyBroadcastEvents(cleanUp) {
+    Broadcast.destroy(cleanUp);
     return this;
   }
 
@@ -261,4 +264,7 @@ export default class Events {
  * Global Broadcast.
  * @type {Events}
  */
-let Broadcast = new Events();
+const Broadcast = new Events();
+
+/** Cache reference for the Global Broadcast. */
+Events.Broadcast = Broadcast;

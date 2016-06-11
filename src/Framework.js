@@ -1,3 +1,4 @@
+import Tags from './Support/DocTags';
 import Events from './Events/Events';
 import Class from './Foundation/Class';
 import Log from './Logger/Log';
@@ -7,11 +8,10 @@ import Container from './Container/Container';
 import * as Mixins from './Mixins/Extend';
 
 /**
- * Export Framework.
- * @type {Object}
- * @typedef {Framework}
+ * Fiber Framework
+ * @typedef {Object} Framework
  */
-export default {
+let Framework = {
   Events,
   Class,
   Bag,
@@ -20,3 +20,6 @@ export default {
   Container,
   Mixins
 };
+
+/** Export Framework. */
+export default Framework;

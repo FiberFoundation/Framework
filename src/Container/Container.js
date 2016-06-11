@@ -37,7 +37,7 @@ export default class Container extends BaseObject {
   /**
    * Register a binding with the container.
    * @param {string|Array} abstract
-   * @param {*} concrete
+   * @param {mixed} concrete
    * @param {?boolean} [shared=false]
    * @returns {Container}
    */
@@ -108,8 +108,8 @@ export default class Container extends BaseObject {
 
   /**
    * Returns closure that can resolve `concrete` type.
-   * @param {*} concrete
-   * @returns {*}
+   * @param {mixed} concrete
+   * @returns {mixed}
    */
   prepareResolvable(concrete) {
     let isFn = _.isFunction(concrete)
@@ -156,7 +156,7 @@ export default class Container extends BaseObject {
   /**
    * Retrieves type from the extensions and shared container
    * @param {string} abstract
-   * @returns {*}
+   * @returns {mixed}
    */
   shared(abstract) {
     return this.instances.get(this.getAbstract(abstract));
@@ -191,7 +191,7 @@ export default class Container extends BaseObject {
 
   /**
    * Determines if parameter can be resolved and injected from the Container.
-   * @param {*} parameter
+   * @param {mixed} parameter
    * @returns {boolean}
    */
   isResolvable(parameter) {

@@ -1,11 +1,13 @@
+import Serializer from '../Serializer/Serializer';
 import Class from './Class';
 import * as _ from 'lodash';
 
 /**
- * Private `items` Symbol.
- * @type {Symbol}
+ * Items storage.
+ * @type {WeakMap}
+ * @private
  */
-const $items$ = Symbol('items');
+let Items = new WeakMap();
 
 /**
  * Fiber Bag
@@ -17,30 +19,32 @@ export default class Bag extends Class {
   /**
    * Constructs Bag.
    * @param {Object} [storable={}]
+   * @param {Object} [options={}]
    */
-  constructor(storable = {}) {
-    super();
-    this[$items$] = storable;
+  constructor(storable = {}, options) {
+    super(options);
+    this.serializer = new Serializer(options.serializeAdapter);
+    Items.set(this, storable);
   }
 
   /**
    * Returns `value` at the given `key` or `defaults` if not exists.
    * @param {string} key
-   * @param {*} [defaults]
-   * @returns {*}
+   * @param {mixed} [defaults]
+   * @returns {mixed}
    */
   get(key, defaults) {
-    return _.get(this[$items$], key, defaults);
+    return _.get(Items.get(this), key, defaults);
   }
 
   /**
    * Sets `value` at the given `key`.
    * @param {string} key
-   * @param {*} value
+   * @param {mixed} value
    * @returns {Bag}
    */
   set(key, value) {
-    _.set(this[$items$], key, value);
+    _.set(Items.get(this), key, value);
     return this;
   }
 
@@ -50,28 +54,28 @@ export default class Bag extends Class {
    * @returns {boolean}
    */
   has(key) {
-    return _.has(this[$items$], key);
+    return _.has(Items.get(this), key);
   }
 
   /**
    * Removes and returns `value` at the given `key`.
    * @param {string} key
-   * @returns {*}
+   * @returns {mixed}
    */
   forget(key) {
     let result = this.get(key);
-    _.unset(this[$items$], key);
+    _.unset(Items.get(this), key);
     return result;
   }
 
   /**
    * Resolves `value` by the given `key` and if `value` is function then it will be called and always returned.
    * @param {string} key
-   * @param {*} [defaults]
-   * @returns {*}
+   * @param {mixed} [defaults]
+   * @returns {mixed}
    */
   result(key, defaults) {
-    return _.result(this[$items$], key, defaults);
+    return _.result(Items.get(this), key, defaults);
   }
 
   /**
@@ -79,7 +83,7 @@ export default class Bag extends Class {
    * @returns {Array}
    */
   keys() {
-    return _.keys(this[$items$]);
+    return _.keys(Items.get(this));
   }
 
   /**
@@ -87,7 +91,7 @@ export default class Bag extends Class {
    * @returns {Array}
    */
   values() {
-    return _.values(this[$items$]);
+    return _.values(Items.get(this));
   }
 
   /**
@@ -96,7 +100,7 @@ export default class Bag extends Class {
    * @returns {Array}
    */
   pick(keys) {
-    return _.pick(this[$items$], keys);
+    return _.pick(Items.get(this), keys);
   }
 
   /**
@@ -105,7 +109,7 @@ export default class Bag extends Class {
    * @returns {Object}
    */
   omit(keys) {
-    return _.omit(this[$items$], keys);
+    return _.omit(Items.get(this), keys);
   }
 
   /**
@@ -114,31 +118,30 @@ export default class Bag extends Class {
    * @returns {Bag}
    */
   merge(object) {
-    return _.merge(this[$items$], object);
+    return _.merge(Items.get(this), object);
   }
 
   /**
    * Traverses each item in a bag.
-   * @param {function(...)} iteratee
+   * @param {Function} iteratee
    * @param {Object} [scope]
    * @returns {Bag}
    */
   each(iteratee, scope) {
-    _.each(this[$items$], scope ? iteratee.bind(scope) : iteratee);
+    _.each(Items.get(this), scope ? iteratee.bind(scope) : iteratee);
     return this;
   }
 
   /**
    * Transforms each item in a bag.
-   * @param {function(...)} iteratee
+   * @param {Function} iteratee
    * @param {Object} [scope]
    * @returns {Bag}
    */
   transform(iteratee, scope) {
-    iteratee = scope ? iteratee.bind(scope) : iteratee
-    for (let key in this[$items$]) {
-      this[$items$][key] = iteratee(this[$items$][key], key, this[$items$]); 
-    }
+    iteratee = scope ? iteratee::scope : iteratee
+    let items = Items.get(this);
+    for (let key in items) items[key] = iteratee(items[key], key, items);
     return this;
   }
 
@@ -147,16 +150,7 @@ export default class Bag extends Class {
    * @returns {Object}
    */
   all() {
-    return this[$items$];
-  }
-
-  /**
-   * Flushes items.
-   * @return {Bag}
-   */
-  flush() {
-    this[$items$] = {};
-    return this;
+    return Items.get(this);
   }
 
   /**
@@ -165,15 +159,36 @@ export default class Bag extends Class {
    * @returns {Object}
    */
   clone(deep = true) {
-    return _[deep ? 'cloneDeep' : 'clone'](this[$items$]);
+    return _[deep ? 'cloneDeep' : 'clone'](Items.get(this));
   }
 
   /**
-   * Creates new Bag with the given `storable` items.
-   * @param {Object} storable
-   * @returns {Bag}
+   * Flushes items.
+   * @return {Bag}
    */
-  $new(storable) {
-    return new Bag(storable);
+  flush() {
+    Items.set(this, {});
+    return this;
+  }
+
+  /**
+   * Serializes Bag to JSON string.
+   * @returns {string}
+   */
+  serialize() {
+    return this.serializer.serialize(Items.get(this));
+  }
+
+  /**
+   * Converts and sets serialized JSON string to Bag.
+   * @param {string} json
+   * @return {Bag}
+   */
+  unserialize(json) {
+    try {
+      var converted = this.serializer.unserialize(json);
+    } catch(e) {}
+    Items.set(this, _.isObject(converted) || {});
+    return this;
   }
 }

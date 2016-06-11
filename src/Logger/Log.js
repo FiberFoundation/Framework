@@ -85,8 +85,8 @@ export default class Log {
 
   /**
    * Logs using current level.
-   * @param {...args}
-   * @returns {*|Log}
+   * @param {...mixed} args
+   * @returns {mixed|Log}
    */
   log(...args) {
     return this.write.apply(GlobalLog, [this.level].concat(...args));
@@ -94,8 +94,8 @@ export default class Log {
 
   /**
    * Logs using `trace` level.
-   * @param {...args}
-   * @returns {*|Log}
+   * @param {...mixed} args
+   * @returns {mixed|Log}
    */
   trace(...args) {
     return this.write.apply(this, ['trace'].concat(...args));
@@ -103,8 +103,8 @@ export default class Log {
 
   /**
    * Logs using `debug` level.
-   * @param {...args}
-   * @returns {*|Log}
+   * @param {...mixed} args
+   * @returns {mixed|Log}
    */
   debug(...args) {
     return this.write.apply(this, ['debug'].concat(...args));
@@ -112,8 +112,8 @@ export default class Log {
 
   /**
    * Logs using `info` level.
-   * @param {...args}
-   * @returns {*|Log}
+   * @param {...mixed} args
+   * @returns {mixed|Log}
    */
   info(...args) {
     return this.write.apply(this, ['info'].concat(...args));
@@ -121,8 +121,8 @@ export default class Log {
 
   /**
    * Logs using `warn` level.
-   * @param {...args}
-   * @returns {*|Log}
+   * @param {...mixed} args
+   * @returns {mixed|Log}
    */
   warn(...args) {
     return this.write.apply(this, ['warn'].concat(...args));
@@ -130,8 +130,8 @@ export default class Log {
 
   /**
    * Logs using `error` level.
-   * @param {...args}
-   * @returns {*|Log}
+   * @param {...mixed} args
+   * @returns {mixed|Log}
    */
   error(...args) {
     return this.write.apply(this, ['error'].concat(...args));
@@ -151,8 +151,8 @@ export default class Log {
 
   /**
    * Logs using current level.
-   * @param {...args}
-   * @returns {*|Log}
+   * @param {...mixed} args
+   * @returns {mixed|Log}
    */
   static log(...args) {
     return GlobalLog.write.apply(GlobalLog, [GlobalLog.level].concat(...args));
@@ -160,8 +160,8 @@ export default class Log {
 
   /**
    * Logs using `trace` level.
-   * @param {...args}
-   * @returns {*|Log}
+   * @param {...mixed} args
+   * @returns {mixed|Log}
    */
   static trace(...args) {
     return GlobalLog.write.apply(GlobalLog, ['trace'].concat(...args));
@@ -169,8 +169,8 @@ export default class Log {
 
   /**
    * Logs using `debug` level.
-   * @param {...args}
-   * @returns {*|Log}
+   * @param {...mixed} args
+   * @returns {mixed|Log}
    */
   static debug(...args) {
     return GlobalLog.write.apply(GlobalLog, ['debug'].concat(...args));
@@ -178,8 +178,8 @@ export default class Log {
 
   /**
    * Logs using `info` level.
-   * @param {...args}
-   * @returns {*|Log}
+   * @param {...mixed} args
+   * @returns {mixed|Log}
    */
   static info(...args) {
     return GlobalLog.write.apply(GlobalLog, ['info'].concat(...args));
@@ -187,8 +187,8 @@ export default class Log {
 
   /**
    * Logs using `warn` level.
-   * @param {...args}
-   * @returns {*|Log}
+   * @param {...mixed} args
+   * @returns {mixed|Log}
    */
   static warn(...args) {
     return GlobalLog.write.apply(GlobalLog, ['warn'].concat(...args));
@@ -196,8 +196,8 @@ export default class Log {
 
   /**
    * Logs using `error` level.
-   * @param {...args}
-   * @returns {*|Log}
+   * @param {...mixed} args
+   * @returns {mixed|Log}
    */
   static error(...args) {
     return GlobalLog.write.apply(GlobalLog, ['error'].concat(...args));
@@ -217,7 +217,7 @@ export default class Log {
   /**
    * Calls writer function with the given level and arguments.
    * @param {string} method
-   * @param {Array} arguments - will be passed to writer function
+   * @param {Array} args - will be passed to writer function
    * @return {Log}
    */
   callWriter(method, args) {
@@ -267,10 +267,10 @@ export default class Log {
    * Logs `message` with a given `level` and `args` and returns `returnValue`.
    * @param {string} level
    * @param {string} message
-   * @param {Array|Arguments|*} args
-   * @param {*} returnVal
+   * @param {Array|Arguments|mixed} args
+   * @param {mixed} returnVal
    * @param {boolean} [tryToCall=true]
-   * @returns {*}
+   * @returns {mixed}
    */
   returns(level, message, args, returnVal, tryToCall = true) {
     this.callWriter(level, [message, args]);

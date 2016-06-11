@@ -1,27 +1,27 @@
-import Events from '../Events/Events';
 import * as _ from 'lodash';
+import Events from '../Events/Events';
 
 /**
- * Fiber Class
+ * Fiber Object.
  * @class
- * @extends Events
+ * @extends {Events}
  **/
-export default class Class extends Events {
+export default class Object extends Events {
 
   /**
-   * Constructs Base Object.
+   * Constructs Fiber Object.
    * @param {Object} [options={}]
    */
   constructor(options = {}) {
-    super(options.ns, options.catalog);
+    super(options);
     this.options = options;
   }
 
   /**
    * Returns `value` at the given `key` or `defaults` if not exists.
    * @param {string} key
-   * @param {*} [defaults]
-   * @returns {*}
+   * @param {mixed} [defaults]
+   * @returns {mixed}
    */
   get(key, defaults) {
     return _.get(this, key, defaults);
@@ -30,8 +30,8 @@ export default class Class extends Events {
   /**
    * Sets `value` at the given `key`.
    * @param {string} key
-   * @param {*} value
-   * @returns {Class}
+   * @param {mixed} value
+   * @returns {Object}
    */
   set(key, value) {
     _.set(this, key, value);
@@ -50,7 +50,7 @@ export default class Class extends Events {
   /**
    * Removes and returns `value` at the given `key`.
    * @param {string} key
-   * @returns {*}
+   * @returns {mixed}
    */
   forget(key) {
     let result = this.get(key);
@@ -61,8 +61,8 @@ export default class Class extends Events {
   /**
    * Resolves `value` by the given `key` and if `value` is function then it will be called and always returned.
    * @param {string} key
-   * @param {*} [defaults]
-   * @returns {*}
+   * @param {mixed} [defaults]
+   * @returns {mixed}
    */
   result(key, defaults) {
     return _.result(this, key, defaults);
@@ -85,6 +85,14 @@ export default class Class extends Events {
   }
 
   /**
+   * Returns array with keys and values.
+   * @returns {Array}
+   */
+  entries() {
+    return [this.keys(), this.values()];
+  }
+
+  /**
    * Returns an object composed of the picked object `keys`.
    * @param {string|Array.<string>} keys
    * @returns {Array}
@@ -103,30 +111,52 @@ export default class Class extends Events {
   }
 
   /**
-   * Includes mixin.
-   * @param {Object} mixin
-   * @returns {Access}
-   */
-  mix(mixin) {
-    return _.assign(this, mixin);
-  }
-
-  /**
    * Merges object with current items.
    * @param {Object} object
-   * @returns {Access}
+   * @returns {Object}
    */
   merge(object) {
     return _.merge(this, object);
   }
 
   /**
-   * Destroys Base Object.
+   * Includes mixin.
+   * @param {Object} mixin
+   * @returns {Object}
+   */
+  mix(mixin) {
+    return _.assign(this, mixin);
+  }
+
+  /**
+   * Serializes Bag to JSON string.
+   * @returns {string}
+   */
+  serialize() {
+    return JSON.stringify(this);
+  }
+
+  /**
+   * Converts and sets serialized JSON string to Bag.
+   * @param {string} json
    * @return {Object}
    */
+  unserialize(json) {
+    try {
+      var converted = JSON.parse(json);
+    } catch(e) {}
+    this.merge(_.isObject(converted) || {});
+    return this;
+  }
+
+  /**
+   * Destroys Base Object.
+   * @return {Object}
+   * @override
+   */
   destroy() {
+    super.destroy();
     this.options = null;
-    this.clearEvents();
     return this;
   }
 }

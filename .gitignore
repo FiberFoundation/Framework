@@ -18,4 +18,3 @@ node_modules
 .idea
 dist
 docs
-tests/manual/manual.js

@@ -1,81 +1,73 @@
-import BaseObject from '../Foundation/Class';
 import Events from '../Events/Events';
 import Log from '../Logger/Log';
 import * as _ from 'lodash';
 
 /**
- * Default Monitor Options.
- * @type {Object}
- * @mixin
+ * Monitor module.
+ *
+ * @class
+ * @extends {Events}
  */
-export let MonitorOptions = {
+export default class Monitor extends Events {
+
   /**
    * Notify options
    * @type {Object}
    */
-  notifies: {
-    stackTrace: true,
-  },
+  notifies = {
+    stackTrace: true
+  };
 
   /**
    * Symbols
    * @type {Object}
    */
-  symbols: {
+  symbols = {
     method: '#',
     event: '@'
-  },
+  };
 
   /**
    * Template to use to notify
    * @type {string}
    */
-  template: '>> <%= symbol %> <%= type %> `<%= param %>` was <%= action %> with arguments:',
+  template = '>> <%= symbol %> <%= type %> `<%= param %>` was <%= action %> with arguments:';
 
   /**
    * Events monitor
    * @type {Fiber.Events}
    * @private
    */
-  _monitor: null,
+  _monitor = null;
 
   /**
    * Cache object
    * @type {Array}
    * @private
    */
-  _cache: [],
+  _cache = [];
 
   /**
    * Logger instance
    * @type {Object.<Fiber.Log>}
    * @private
    */
-  _logger: null,
+  _logger = null;
 
   /**
    * Log templates
    * @type {Object}
    */
-  _templates: {
+  _templates = {
     level: false,
     delimiter: false
-  },
+  };
 
   /**
    * List of objects that are monitored for Global Events
    * @type {Array}
    */
-  _watchingGlobalEventsOn: []
-};
-
-/**
- * Monitor module
- * @class
- * @extends {BaseObject}
- * @mixes MonitorConfig
- */
-export default class Monitor extends BaseObject {
+  _watchingGlobalEventsOn = [];
 
   /**
    * Constructs Debug
@@ -83,7 +75,7 @@ export default class Monitor extends BaseObject {
    */
   constructor(options) {
     super(options);
-    _.extend(this, MonitorOptions, options);
+    _.extend(this, options);
     this._monitor = Events.$new();
     this._logger = new Log({level: 'debug', as: '[Fiber.Monitor]', templates: this._templates});
     this._listeningToGlobals(true);
@@ -213,7 +205,7 @@ export default class Monitor extends BaseObject {
    * Notifies about event
    * @param {string} event
    * @param {Array|Arguments} args
-   * @param {*} stack
+   * @param {mixed} stack
    * @return {Monitor}
    */
   notifyEvent(event, args, stack) {
@@ -224,7 +216,7 @@ export default class Monitor extends BaseObject {
    * Notifies about method call
    * @param {string} method
    * @param {Array|Arguments} args
-   * @param {*} stack
+   * @param {mixed} stack
    * @return {Monitor}
    */
   notifyMethod(method, args, stack) {
@@ -243,7 +235,7 @@ export default class Monitor extends BaseObject {
   /**
    * Notifies that event was triggered.
    * @param {string} event
-   * @param {...args}
+   * @param {...mixed} args
    * @private
    */
   _fired(event, object) {
@@ -253,7 +245,7 @@ export default class Monitor extends BaseObject {
   /**
    * Notifies that Global event was triggered.
    * @param {string} event
-   * @param {...args}
+   * @param {...mixed} args
    * @private
    */
   _firedGlobal(event, object) {
@@ -267,7 +259,7 @@ export default class Monitor extends BaseObject {
    * @param {string} type
    * @param {string} parameter
    * @param {Array|Arguments} args
-   * @param {*} [stack]
+   * @param {mixed} [stack]
    * @returns {Monitor}
    * @private
    */
@@ -288,11 +280,11 @@ export default class Monitor extends BaseObject {
 
   /**
    * Returns stack trace for the current call.
-   * @returns {*|string}
+   * @returns {mixed|string}
    * @private
    */
   _getStackTrace() {
-    if (this.notifies.stackTrace) try {let stack = (new Error).stack;}
+    if (this.notifies.stackTrace) try {var stack = (new Error).stack;}
     catch (e) {}
     return this._prepareStackTrace(stack) || '';
   }
@@ -304,16 +296,12 @@ export default class Monitor extends BaseObject {
    * @private
    */
   _prepareStackTrace(stackTrace) {
-    // jscs:disable validateQuoteMarks
     let stack = (stackTrace || '').split("\n");
-    // jscs:enable validateQuoteMarks
     if (stack.length > 2) {
       stack.shift();
       stack.shift();
     }
-    // jscs:disable validateQuoteMarks
     return "\n" + stack.join("\n");
-    // jscs:enable validateQuoteMarks
   }
 
   /**

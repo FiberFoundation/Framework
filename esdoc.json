@@ -1,0 +1,13 @@
+{
+  "title": "Fiber Framework",
+  "source": "./src",
+  "destination": "./docs",
+  "autoPrivate": false,
+  "plugins": [
+    {"name": "esdoc-es7-plugin"}
+  ],
+  "test": {
+    "type": "mocha",
+    "source": "./tests"
+  }
+}

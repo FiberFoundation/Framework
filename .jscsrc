@@ -64,7 +64,6 @@
 	"requireShorthandArrowFunctions": true,
 	"safeContextKeyword": ["this", "that", "_this", "self", "object"],
 	"validateLineBreaks": "LF",
-	"validateQuoteMarks": { "mark": "'", "escape": true, "ignoreJSX": true },
 	"validateIndentation": 2,
 	"maximumLineLength": {
 		"value": 120,

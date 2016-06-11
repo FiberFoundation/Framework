@@ -1,8 +1,9 @@
-import Events from '../../src/Events/Events';
 import TestSuite from '../support/TestSuite';
+import Events  from '../../src/Events/Events';
 import chai from 'chai';
 
 const expect = chai.expect;
+const Broadcast = Events.Broadcast;
 
 var Suite = new TestSuite('Events', function () {
 
@@ -12,8 +13,8 @@ var Suite = new TestSuite('Events', function () {
 
   beforeEach(function() {
     this.vent.resetNsAndCatalog();
-    this.vent.clearEvents();
-    this.vent.clearBroadcastEvents();
+    this.vent.destroy();
+    this.vent.destroyBroadcastEvents();
   });
 
   after(function() {
@@ -154,18 +155,11 @@ var Suite = new TestSuite('Events', function () {
     expect(stopBroadcast).to.not.be.called;
   });
 
-  it('`getBroadcast`: should return current global Broadcast Events.', function() {
-    var Broadcast = this.vent.getBroadcast();
-    Broadcast.clearEvents(true);
-    expect(Broadcast).to.instanceof(Events);
-  });
-
-
-  it('`setBroadcast`: should set new global Broadcast Events.', function() {
-    var newBroadcast = new Events();
-    this.vent.setBroadcast(newBroadcast);
-    var Broadcast = this.vent.getBroadcast();
-    expect(Broadcast).to.be.equal(newBroadcast);
+  it('`channel`: should create new Events channel.', function() {
+    let channel = this.vent.channel('channel');
+    expect(channel).to.be.instanceof(Events);
+    let sameChannel = this.vent.channel('channel');
+    expect(channel).to.be.equal(sameChannel);
   });
 
   it('`createEventListener`: should create listener only for functions.', function() {
@@ -177,9 +171,8 @@ var Suite = new TestSuite('Events', function () {
     expect(listener).to.be.function;
   });
 
-  it('`clearEvents`: should clear all bound events to the object.', function() {
+  it('`destroy`: should clear all bound events to the object.', function() {
     expect(this.vent._listenId).to.be.string;
-    var broadcast = this.vent.getBroadcast();
     var cbs = {event: function() {}, 'new:event': function() {}, global: function() {}};
     var spies = {};
 
@@ -191,14 +184,14 @@ var Suite = new TestSuite('Events', function () {
     }
 
     expect(this.vent._listeningTo).to.have.property(this.vent._listenId);
-    expect(broadcast._listeningTo).to.have.property(this.vent._listenId);
+    expect(Broadcast._listeningTo).to.have.property(this.vent._listenId);
 
-    this.vent.clearEvents();
+    this.vent.destroy();
     this.vent.trigger('event');
 
     expect(spies.event).to.not.be.called;
     expect(this.vent._listeningTo).to.not.have.property(this.vent._listenId);
-    expect(broadcast._listeningTo).to.have.property(this.vent._listenId);
+    expect(Broadcast._listeningTo).to.have.property(this.vent._listenId);
   });
 
   it('`resetNsAndCatalog`: should reset namespace and catalog.', function() {

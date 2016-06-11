@@ -28,7 +28,7 @@ function createPrototype(ctor, proto = {}) {
 
 /**
  * Transforms plain object to Class.
- * @param {Object|*} proto
+ * @param {Object|mixed} proto
  * @return {Function}
  */
 export function Classify(proto) {
@@ -39,7 +39,7 @@ export function Classify(proto) {
 
 /**
  * Joins prototypes with override into one object.
- * @param {...args}
+ * @param {...Object} args
  * @returns {Object}
  */
 export function Join(...args) {
@@ -48,7 +48,7 @@ export function Join(...args) {
 
 /**
  * Deeply merges prototypes into one object.
- * @param {...args}
+ * @param {...Object} args
  * @returns {Object}
  */
 export function Merge(...args) {
@@ -58,7 +58,7 @@ export function Merge(...args) {
 /**
  * Provides multiple extend.
  * @param {Function} parent
- * @param {...args}
+ * @param {...Object} args
  * @returns {Function}
  */
 export function Multi(parent, ...args) {
@@ -71,11 +71,11 @@ export function Multi(parent, ...args) {
  * pointing to parent constructor.
  * @param parent
  * @param proto
- * @returns {*}
+ * @returns {mixed}
  * @constructor
  */
 export function Extend(parent, proto) {
-  var child;
+  let child;
   // if we don't have any parent then log error and return
   if (! parent) {
     Log.warn('`Parent` is not provided or not valid, setting to `noop` function', parent);
@@ -118,7 +118,7 @@ export function Instance(parent, args) {
 
 /**
  * Checks if given object is Class constructor.
- * @param {*} Class
+ * @param {mixed} object
  * @returns {boolean}
  */
 export function isClass(object) {
@@ -127,7 +127,7 @@ export function isClass(object) {
 
 /**
  * Checks if given object is instance (not a Class)
- * @param instance
+ * @param {mixed} object
  * @returns {boolean}
  */
 export function isInstance(object) {
