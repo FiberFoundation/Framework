@@ -14,7 +14,9 @@ export default class Serializer {
    * @type {Object}
    * @static
    */
-  static Parsers = {AbstractParser};
+  static Parsers = {
+    Abstract: AbstractParser
+  };
 
   /**
    * Adapters
