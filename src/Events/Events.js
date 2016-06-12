@@ -21,9 +21,9 @@ export default class Events {
    */
   constructor({ns, catalog} = {ns: '', catalog: {}}) {
     /** @type {string} */
-    this.ns = ns;
+    this.ns = ns || '';
     /** @type {Object} */
-    this.catalog = catalog;
+    this.catalog = catalog || {};
   }
 
   /**

@@ -26,22 +26,20 @@ export default class JsonAdapter extends SerializeAdapter {
   /**
    * Returns `object` converted to string.
    * @param {Object} object
-   * @param {Object} [defaults]
    * @returns {string}
    * @override
    */
-  serialize(object, defaults) {
+  serialize(object) {
     return this.parser.stringify(object, this.options.replacer, this.options.space);
   }
 
   /**
    * Returns object parsed from `string`.
    * @param {string} string
-   * @param {Object} [defaults]
    * @returns {Object}
    * @override
    */
-  unserialize(string, defaults) {
+  unserialize(string) {
     return this.parser.parse(string, this.options.reviver);
   }
 }

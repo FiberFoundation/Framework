@@ -1,67 +1,22 @@
-import Class from '../Foundation/Class';
+import Serializer from '../Serializer/Serializer';
 import * as _ from 'lodash';
-
-/**
- * Default Log configuration.
- * @type {Object}
- * @mixin
- */
-export const LogConfig = {
-
-  /**
-   * Current log level.
-   * @type {string}
-   * @private
-   */
-  level: 'trace',
-
-  /**
-   * Available log levels.
-   * @type {Object}
-   */
-  levels: {
-    trace: 'trace',
-    debug: 'debug',
-    info: 'info',
-    warn: 'warn',
-    error: 'error'
-  },
-
-  /**
-   * String representing who is logging the messages.
-   * @type {string}
-   */
-  as: '[Fiber.Log]',
-
-  /**
-   * Templates storage.
-   * @type {Object}
-   */
-  templates: {
-    timestamp: '<%= timestamp %>',
-    as: '<%= as %>',
-    level: '<%= level %>',
-    delimiter: '>>',
-    msg: '<%= msg %>'
-  }
-};
 
 /**
  * Supported Console API Methods
  * @type {Object}
  * @private
  */
-const _api = {
+const ApiMethods = {
   log: 'log',
   info: 'info',
   warn: 'warn',
   error: 'error',
-  debug: 'info',
+  debug: ['debug', 'log'],
   dir: 'dir',
   time: 'time',
   timeEnd: 'timeEnd',
   trace: 'trace',
-  assert: 'assert',
+  assert: 'assert'
 };
 
 /**
@@ -72,13 +27,50 @@ const _api = {
 export default class Log {
 
   /**
-   * Constructs Log.
-   * @param {Object} [options]
+   * String representing who is logging the messages.
+   * @type {string}
    */
-  constructor(options) {
+  as = '[Fiber.Log]';
+
+  /**
+   * Current log level.
+   * @type {string}
+   * @private
+   */
+  level = 'info';
+
+  /**
+   * Available log levels.
+   * @type {Object}
+   */
+  levels = {
+    trace: 'trace',
+    debug: 'debug',
+    info: 'info',
+    warn: 'warn',
+    error: 'error'
+  };
+
+  /**
+   * Templates storage.
+   * @type {Object}
+   */
+  templates = {
+    timestamp: '<%= timestamp %>',
+    as: '<%= as %>:',
+    level: '`<%= level %>`',
+    delimiter: '>>',
+    msg: '<%= msg %>'
+  };
+
+  /**
+   * Constructs Log.
+   * @param {Object} [options={}]
+   */
+  constructor(options = {}) {
     this._timers = [];
     this._cachedApi = {};
-    _.extend(this, LogConfig, options);
+    _.extend(this, options);
     this._cacheConsoleApi();
     this._handleTemplatesExtend(options);
   }
@@ -89,7 +81,7 @@ export default class Log {
    * @returns {mixed|Log}
    */
   log(...args) {
-    return this.write.apply(GlobalLog, [this.level].concat(...args));
+    return this.write(this.level, args);
   }
 
   /**
@@ -98,7 +90,7 @@ export default class Log {
    * @returns {mixed|Log}
    */
   trace(...args) {
-    return this.write.apply(this, ['trace'].concat(...args));
+    return this.write('trace', args);
   }
 
   /**
@@ -107,7 +99,7 @@ export default class Log {
    * @returns {mixed|Log}
    */
   debug(...args) {
-    return this.write.apply(this, ['debug'].concat(...args));
+    return this.write('debug', args);
   }
 
   /**
@@ -116,7 +108,7 @@ export default class Log {
    * @returns {mixed|Log}
    */
   info(...args) {
-    return this.write.apply(this, ['info'].concat(...args));
+    return this.write('info', args);
   }
 
   /**
@@ -125,7 +117,7 @@ export default class Log {
    * @returns {mixed|Log}
    */
   warn(...args) {
-    return this.write.apply(this, ['warn'].concat(...args));
+    return this.write('warn', args);
   }
 
   /**
@@ -134,7 +126,7 @@ export default class Log {
    * @returns {mixed|Log}
    */
   error(...args) {
-    return this.write.apply(this, ['error'].concat(...args));
+    return this.write('error', args);
   }
 
   /**
@@ -144,7 +136,7 @@ export default class Log {
    * @return {Log}
    */
   write(level, args) {
-    level = _.includes(_api, level) ? level : 'log';
+    level = _.includes(ApiMethods, level) ? level : 'log';
     if (! this.isAllowedLevel(level)) return this;
     return this.callWriter(level, args);
   }
@@ -155,7 +147,7 @@ export default class Log {
    * @returns {mixed|Log}
    */
   static log(...args) {
-    return GlobalLog.write.apply(GlobalLog, [GlobalLog.level].concat(...args));
+    return Internal.write(Internal.level, args);
   }
 
   /**
@@ -164,7 +156,7 @@ export default class Log {
    * @returns {mixed|Log}
    */
   static trace(...args) {
-    return GlobalLog.write.apply(GlobalLog, ['trace'].concat(...args));
+    return Internal.write('trace', args);
   }
 
   /**
@@ -173,7 +165,7 @@ export default class Log {
    * @returns {mixed|Log}
    */
   static debug(...args) {
-    return GlobalLog.write.apply(GlobalLog, ['debug'].concat(...args));
+    return Internal.write('debug', args);
   }
 
   /**
@@ -182,7 +174,7 @@ export default class Log {
    * @returns {mixed|Log}
    */
   static info(...args) {
-    return GlobalLog.write.apply(GlobalLog, ['info'].concat(...args));
+    return Internal.write('info', args);
   }
 
   /**
@@ -191,7 +183,7 @@ export default class Log {
    * @returns {mixed|Log}
    */
   static warn(...args) {
-    return GlobalLog.write.apply(GlobalLog, ['warn'].concat(...args));
+    return Internal.write('warn', args);
   }
 
   /**
@@ -200,7 +192,7 @@ export default class Log {
    * @returns {mixed|Log}
    */
   static error(...args) {
-    return GlobalLog.write.apply(GlobalLog, ['error'].concat(...args));
+    return Internal.write('error', args);
   }
 
   /**
@@ -211,7 +203,19 @@ export default class Log {
    * @static
    */
   static write(level, args) {
-    return GlobalLog.write(level, args);
+    return Internal.write(level, args);
+  }
+
+  /**
+   * Starts/Stops timer by `name`.
+   * @param {string} name
+   * @returns {Log}
+   */
+  timer(name) {
+    let index = this._timers.indexOf(name), method = ~ index ? 'timeEnd' : 'time';
+    if (! (~ index)) this._timers.push(name);
+    else this._timers.splice(index, 1);
+    return this.callWriter(method, [name]);
   }
 
   /**
@@ -221,9 +225,9 @@ export default class Log {
    * @return {Log}
    */
   callWriter(method, args) {
-    method = _.includes(_api, level) ? level : 'log';
+    method = _.includes(ApiMethods, method) ? method : 'log';
     if (! _.isFunction(this._cachedApi[method])) return this;
-    let msg = _.first(args), details = this.renderTemplate({msg: _.isString(msg) ? msg : ''});
+    let msg = _.first(args), details = this.renderTemplate({msg: _.isString(msg) ? msg : '', level: method});
     this._cachedApi[method].apply(null, [details].concat(_.drop(args)));
     return this;
   }
@@ -243,7 +247,7 @@ export default class Log {
    * @returns {string}
    */
   getTemplate(glue) {
-    return _.compact(_.map(_.result(this.templates), function(part) {
+    return _.compact(_.map(_.result(this, 'templates'), function(part) {
       if (_.isString(part) || _.isFunction(part)) return part;
     })).join(glue || ' ');
   }
@@ -261,32 +265,6 @@ export default class Log {
       as: this.as,
       timestamp: date.toTimeString().slice(0, 8) + '.' + date.getMilliseconds()
     }, data);
-  }
-
-  /**
-   * Logs `message` with a given `level` and `args` and returns `returnValue`.
-   * @param {string} level
-   * @param {string} message
-   * @param {Array|Arguments|mixed} args
-   * @param {mixed} returnVal
-   * @param {boolean} [tryToCall=true]
-   * @returns {mixed}
-   */
-  returns(level, message, args, returnVal, tryToCall = true) {
-    this.callWriter(level, [message, args]);
-    return tryToCall ? _.result(returnVal) : returnVal;
-  }
-
-  /**
-   * Starts/Stops timer by `name`.
-   * @param {string} name
-   * @returns {Log}
-   */
-  timer(name) {
-    let index = this._timers.indexOf(name), method = ~ index ? 'timeEnd' : 'time';
-    if (! (~ index)) this._timers.push(name);
-    else this._timers.splice(index, 1);
-    return this.callWriter(method, [name]);
   }
 
   /**
@@ -309,8 +287,15 @@ export default class Log {
    * @private
    */
   _cacheConsoleApi() {
-    for (let method in _api) {
-      this._cachedApi[_api[method]] = _.bind(console[_api[method]], console);
+    for (let method in ApiMethods) {
+      let apiMethod = ApiMethods[method];
+      let isArr = _.isArray(apiMethod);
+
+      if (isArr && _.has(console, apiMethod[0])) apiMethod = apiMethod[0];
+      else if (isArr) apiMethod = apiMethod[1];
+      else if (! _.has(console, apiMethod)) continue;
+
+      this._cachedApi[apiMethod] = _.bind(console[apiMethod], console);
     }
     return this._cachedApi;
   }
@@ -330,7 +315,7 @@ export default class Log {
 }
 
 /**
- * Global Logger.
+ * Logger used internally for static conversion.
  * @type {Log}
  */
-export const GlobalLog = new Log();
+const Internal = new Log();

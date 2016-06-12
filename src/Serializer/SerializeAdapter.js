@@ -26,10 +26,9 @@ export default class SerializeAdapter {
   /**
    * Returns `object` converted to string.
    * @param {Object} object
-   * @param {Object} [defaults]
    * @returns {string}
    */
-  serialize(object, defaults) {
+  serialize(object) {
     throw new Error('[SerializeAdapter]: `serialize` methods should be overridden in Child Class.');
     return '';
   }
@@ -37,10 +36,9 @@ export default class SerializeAdapter {
   /**
    * Returns object parsed from `string`.
    * @param {string} string
-   * @param {Object} [defaults]
    * @returns {Object}
    */
-  unserialize(string, defaults) {
+  unserialize(string) {
     throw new Error('[SerializeAdapter]: `unserialize` methods should be overridden in Child Class.');
     return {};
   }

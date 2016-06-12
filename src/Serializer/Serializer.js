@@ -30,7 +30,7 @@ export default class Serializer {
 
   /**
    * Constructs Serializer.
-   * @param {SerializeAdapter} [adapter]
+   * @param {SerializeAdapter} [adapter=JsonSerializeAdapter]
    */
   constructor(adapter = new JsonSerializeAdapter()) {
     if (adapter instanceof SerializeAdapter) {
@@ -46,14 +46,7 @@ export default class Serializer {
    * @returns {string}
    */
   serialize(object, defaults = '') {
-    try {
-      var string = this.adapter.serialize(object);
-    } catch(e) {
-      string = defaults;
-      Log.error('[Serializer]: Given `object` cannot be converted to `string` using current adapter.', e);
-    }
-
-    return string;
+    return convert(this.adapter, 'serialize', object, defaults);
   }
 
   /**
@@ -63,13 +56,56 @@ export default class Serializer {
    * @returns {Object}
    */
   unserialize(string, defaults = {}) {
-    try {
-      var object = this.adapter.unserialize(string);
-    } catch(e) {
-      object = defaults;
-      Log.error('[Serializer]: Given `string` cannot be converted to `object` using current adapter.', e);
-    }
-
-    return object;
+    return convert(this.adapter, 'unserialize', string, defaults);
   }
+
+  /**
+   * Returns `object` converted to string.
+   * @param {Object} object
+   * @param {Object} [defaults = '']
+   * @returns {string}
+   * @static
+   */
+  static serialize(object, defaults = '') {
+    return Internal.serialize(object, defaults);
+  }
+
+  /**
+   * Returns object parsed from `string`.
+   * @param {string} string
+   * @param {Object} [defaults = {}]
+   * @returns {Object}
+   * @static
+   */
+  static unserialize(object, defaults = {}) {
+    return Internal.unserialize(object, defaults);
+  }
+}
+
+/**
+ * Serializer used internally for static conversion.
+ * @type {Serializer}
+ */
+const Internal = new Serializer();
+
+/**
+ * Converts from/to JSON representation.
+ * @param {SerializeAdapter} adapter
+ * @param {string} method
+ * @param {string|Object} what
+ * @param {string|Object} [defaults]
+ * @returns {*}
+ */
+function convert(adapter, method, what, defaults) {
+  try {
+    var converted = adapter[method](what);
+  }
+  catch (e) {
+    converted = defaults || method === 'serialize' ? '' : {};
+    let from = method === 'serialize' ? 'object' : 'string';
+    let to = method === 'serialize' ? 'string' : 'object';
+    Log.error(`[Serializer]: Given ${from} cannot be converted to ${to} using current adapter.`, e, this);
+  }
+
+  return converted;
 }
