@@ -1,4 +1,3 @@
-import Serializer from '../Serializer/Serializer';
 import Class from './Class';
 import * as _ from 'lodash';
 
@@ -12,7 +11,7 @@ let Items = new WeakMap();
 /**
  * Fiber Bag
  * @class
- * @extends Class
+ * @extends {Class}
  */
 export default class Bag extends Class {
 
@@ -21,9 +20,8 @@ export default class Bag extends Class {
    * @param {Object} [storable={}]
    * @param {Object} [options={}]
    */
-  constructor(storable = {}, options) {
+  constructor(storable = {}, options = {}) {
     super(options);
-    this.serializer = new Serializer(options.serializeAdapter);
     Items.set(this, storable);
   }
 
@@ -184,11 +182,8 @@ export default class Bag extends Class {
    * @param {string} json
    * @return {Bag}
    */
-  unserialize(json) {
-    try {
-      var converted = this.serializer.unserialize(json);
-    } catch(e) {}
-    Items.set(this, _.isObject(converted) || {});
+  fromSerialized(json) {
+    Items.set(this, this.serializer.unserialize(json));
     return this;
   }
 }

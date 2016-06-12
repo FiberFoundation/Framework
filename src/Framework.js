@@ -5,11 +5,12 @@ import Log from './Logger/Log';
 import Monitor from './Monitor/Monitor';
 import Bag from './Foundation/Bag';
 import Container from './Container/Container';
+import Serializer from './Serializer/Serializer';
 import * as Mixins from './Mixins/Extend';
 
 /**
  * Fiber Framework
- * @typedef {Object} Framework
+ * @type {Framework}
  */
 let Framework = {
   Events,
@@ -18,7 +19,8 @@ let Framework = {
   Log,
   Monitor,
   Container,
-  Mixins
+  Serializer,
+  Mixins,
 };
 
 /** Export Framework. */

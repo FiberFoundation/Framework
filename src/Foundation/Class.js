@@ -1,12 +1,13 @@
 import * as _ from 'lodash';
 import Events from '../Events/Events';
+import Serializer from '../Serializer/Serializer';
 
 /**
- * Fiber Object.
+ * Fiber Class.
  * @class
  * @extends {Events}
  **/
-export default class Object extends Events {
+export default class Class extends Events {
 
   /**
    * Constructs Fiber Object.
@@ -15,6 +16,7 @@ export default class Object extends Events {
   constructor(options = {}) {
     super(options);
     this.options = options;
+    this.serializer = new Serializer(options.serializeAdapter);
   }
 
   /**
@@ -31,7 +33,7 @@ export default class Object extends Events {
    * Sets `value` at the given `key`.
    * @param {string} key
    * @param {mixed} value
-   * @returns {Object}
+   * @returns {Class}
    */
   set(key, value) {
     _.set(this, key, value);
@@ -113,7 +115,7 @@ export default class Object extends Events {
   /**
    * Merges object with current items.
    * @param {Object} object
-   * @returns {Object}
+   * @returns {Class}
    */
   merge(object) {
     return _.merge(this, object);
@@ -122,7 +124,7 @@ export default class Object extends Events {
   /**
    * Includes mixin.
    * @param {Object} mixin
-   * @returns {Object}
+   * @returns {Class}
    */
   mix(mixin) {
     return _.assign(this, mixin);
@@ -133,25 +135,22 @@ export default class Object extends Events {
    * @returns {string}
    */
   serialize() {
-    return JSON.stringify(this);
+    return this.serializer.serialize(this);
   }
 
   /**
    * Converts and sets serialized JSON string to Bag.
    * @param {string} json
-   * @return {Object}
+   * @returns {Class}
    */
-  unserialize(json) {
-    try {
-      var converted = JSON.parse(json);
-    } catch(e) {}
-    this.merge(_.isObject(converted) || {});
+  fromSerialized(json) {
+    this.mix(this.serializer.unserialize(json));
     return this;
   }
 
   /**
    * Destroys Base Object.
-   * @return {Object}
+   * @returns {Class}
    * @override
    */
   destroy() {

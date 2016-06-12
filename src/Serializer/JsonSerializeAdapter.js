@@ -1,4 +1,5 @@
 import SerializeAdapter from './SerializeAdapter';
+import * as _ from 'lodash';
 
 /**
  * JSON Serialize Adapter.
