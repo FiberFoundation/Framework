@@ -1,4 +1,4 @@
-import BaseObject from '../Foundation/Class';
+import Class from '../Foundation/Class';
 import Bag from '../Foundation/Bag';
 import * as _ from 'lodash';
 
@@ -11,8 +11,9 @@ export const RESOLVABLE_POSTFIX = '!';
 /**
  * Fiber Inverse Of Control Container
  * @class
+ * @extends {Class}
  */
-export default class Container extends BaseObject {
+export default class Container extends Class {
 
   /**
    * Constructs Container
@@ -37,7 +38,7 @@ export default class Container extends BaseObject {
   /**
    * Register a binding with the container.
    * @param {string|Array} abstract
-   * @param {mixed} concrete
+   * @param {any} concrete
    * @param {?boolean} [shared=false]
    * @returns {Container}
    */
@@ -108,8 +109,8 @@ export default class Container extends BaseObject {
 
   /**
    * Returns closure that can resolve `concrete` type.
-   * @param {mixed} concrete
-   * @returns {mixed}
+   * @param {any} concrete
+   * @returns {any}
    */
   prepareResolvable(concrete) {
     let isFn = _.isFunction(concrete)
@@ -156,7 +157,7 @@ export default class Container extends BaseObject {
   /**
    * Retrieves type from the extensions and shared container
    * @param {string} abstract
-   * @returns {mixed}
+   * @returns {any}
    */
   shared(abstract) {
     return this.instances.get(this.getAbstract(abstract));
@@ -191,7 +192,7 @@ export default class Container extends BaseObject {
 
   /**
    * Determines if parameter can be resolved and injected from the Container.
-   * @param {mixed} parameter
+   * @param {any} parameter
    * @returns {boolean}
    */
   isResolvable(parameter) {

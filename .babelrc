@@ -3,7 +3,6 @@
   "plugins": [
     "add-module-exports",
     "transform-function-bind",
-    "transform-undefined-to-void",
     "transform-class-properties",
     "transform-undefined-to-void",
     "transform-object-rest-spread",

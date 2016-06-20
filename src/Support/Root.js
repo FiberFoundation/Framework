@@ -1,6 +1,6 @@
 /**
  * Checks if `value` can be potential global object.
- * @param {mixed} value
+ * @param {any} value
  * @returns {null|Object}
  * @private
  */

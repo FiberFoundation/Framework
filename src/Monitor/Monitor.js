@@ -1,4 +1,4 @@
-import Events from '../Events/Events';
+import Emitter from '../Events/Emitter';
 import Log from '../Logger/Log';
 import * as _ from 'lodash';
 
@@ -6,9 +6,9 @@ import * as _ from 'lodash';
  * Monitor module.
  *
  * @class
- * @extends {Events}
+ * @extends {Emitter}
  */
-export default class Monitor extends Events {
+export default class Monitor extends Emitter {
 
   /**
    * Notify options
@@ -34,7 +34,7 @@ export default class Monitor extends Events {
   template = '>> <%= symbol %> <%= type %> `<%= param %>` was <%= action %> with arguments:';
 
   /**
-   * Events monitor
+   * Emitter monitor
    * @type {Fiber.Events}
    * @private
    */
@@ -64,7 +64,7 @@ export default class Monitor extends Events {
   };
 
   /**
-   * List of objects that are monitored for Global Events
+   * List of objects that are monitored for Global Emitter
    * @type {Array}
    */
   _watchingGlobalEventsOn = [];
@@ -205,7 +205,7 @@ export default class Monitor extends Events {
    * Notifies about event
    * @param {string} event
    * @param {Array|Arguments} args
-   * @param {mixed} stack
+   * @param {any} stack
    * @return {Monitor}
    */
   notifyEvent(event, args, stack) {
@@ -216,7 +216,7 @@ export default class Monitor extends Events {
    * Notifies about method call
    * @param {string} method
    * @param {Array|Arguments} args
-   * @param {mixed} stack
+   * @param {any} stack
    * @return {Monitor}
    */
   notifyMethod(method, args, stack) {
@@ -224,7 +224,7 @@ export default class Monitor extends Events {
   }
 
   /**
-   * Starts/Stops listening to Global Events.
+   * Starts/Stops listening to Global Emitter.
    * @param {boolean} state
    * @private
    */
@@ -235,7 +235,7 @@ export default class Monitor extends Events {
   /**
    * Notifies that event was triggered.
    * @param {string} event
-   * @param {...mixed} args
+   * @param {...any} args
    * @private
    */
   _fired(event, object) {
@@ -245,7 +245,7 @@ export default class Monitor extends Events {
   /**
    * Notifies that Global event was triggered.
    * @param {string} event
-   * @param {...mixed} args
+   * @param {...any} args
    * @private
    */
   _firedGlobal(event, object) {
@@ -259,7 +259,7 @@ export default class Monitor extends Events {
    * @param {string} type
    * @param {string} parameter
    * @param {Array|Arguments} args
-   * @param {mixed} [stack]
+   * @param {any} [stack]
    * @returns {Monitor}
    * @private
    */
@@ -280,7 +280,7 @@ export default class Monitor extends Events {
 
   /**
    * Returns stack trace for the current call.
-   * @returns {mixed|string}
+   * @returns {any|string}
    * @private
    */
   _getStackTrace() {

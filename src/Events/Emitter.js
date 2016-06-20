@@ -3,17 +3,17 @@ import * as _ from 'lodash';
 
 /**
  * Channels storage.
- * Manages the private channels data of Events classes.
+ * Manages the private channels data of Emitter classes.
  * @type {WeakMap}
  * @private
  */
 let Channels = new WeakMap();
 
 /**
- * Fiber Events.
+ * Fiber Emitter.
  * @class
  */
-export default class Events {
+export default class Emitter {
 
   /**
    * Constructs Events.
@@ -46,8 +46,8 @@ export default class Events {
   /**
    * Triggers events with the given arguments.
    * @param {string} event
-   * @param {...mixed} args
-   * @returns {Events}
+   * @param {...any} args
+   * @returns {Emitter}
    */
   trigger(event, ...args) {
     return Vent.trigger.apply(this, arguments);
@@ -56,8 +56,8 @@ export default class Events {
   /**
    * Fires event with namespace and catalog look up.
    * @param {string} event
-   * @param {...mixed} args
-   * @returns {Events}
+   * @param {...any} args
+   * @returns {Emitter}
    */
   fire(event, ...args) {
     return this.trigger.apply(this, [this.event(event)].concat(...args));
@@ -69,7 +69,7 @@ export default class Events {
    * @param {string} event
    * @param {Function} listener
    * @param {Object} [scope]
-   * @returns {Events}
+   * @returns {Emitter}
    */
   on(event, listener, scope) {
     return this.when(this, event, listener, scope);
@@ -83,7 +83,7 @@ export default class Events {
    * @param {string} event
    * @param {Function} listener
    * @param {Object} [scope]
-   * @returns {Events}
+   * @returns {Emitter}
    */
   once(event, listener, scope) {
     return this.after(this, event, listener, scope);
@@ -93,11 +93,11 @@ export default class Events {
    * Inversion-of-control versions of `on`. Tells `this` object to listen to
    * an event in another object... keeping track of what it's listening to
    * for easier unbinding later.
-   * @param {Object|Events|string} object
+   * @param {Object|Emitter|string} object
    * @param {string|Function} event
    * @param {Function|Object} listener
    * @param {Object} [scope]
-   * @returns {Events}
+   * @returns {Emitter}
    */
   when(object, event, listener, scope) {
     if (_.isString(object)) [listener, event, object] = [event, object, this];
@@ -108,11 +108,11 @@ export default class Events {
 
   /**
    * Inversion-of-control versions of `once`.
-   * @param {Object|Events|string} object
+   * @param {Object|Emitter|string} object
    * @param {string|Function} event
    * @param {Function|Object} listener
    * @param {Object} [scope]
-   * @returns {Events}
+   * @returns {Emitter}
    */
   after(object, event, listener, scope) {
     if (_.isString(object)) [listener, event, object] = [event, object, this];
@@ -126,11 +126,11 @@ export default class Events {
    * listeners with that function. If `listener` is null, removes all
    * listeners for the event. If `name` is null, removes all bound
    * listeners for all events.
-   * @param {Object|Events|string} [object]
+   * @param {Object|Emitter|string} [object]
    * @param {string|Function} [event]
    * @param {Function|Object} [listener]
    * @param {Object} [scope]
-   * @returns {Events}
+   * @returns {Emitter}
    */
   off(object, event, listener, scope) {
     if (_.isString(object)) [listener, event, object] = [event, object, this];
@@ -145,7 +145,7 @@ export default class Events {
    * @param {string} event
    * @param {Function} listener
    * @param {Object} [scope]
-   * @returns {Events}
+   * @returns {Emitter}
    */
   whenBroadcast(event, listener, scope) {
     Broadcast.when(event, listener, scope);
@@ -158,7 +158,7 @@ export default class Events {
    * @param {string} event
    * @param {Function} listener
    * @param {Object} [scope]
-   * @returns {Events}
+   * @returns {Emitter}
    */
   afterBroadcast(event, listener, scope) {
     Broadcast.after(event, listener, scope);
@@ -172,7 +172,7 @@ export default class Events {
    * @param {string} event
    * @param {Function} listener
    * @param {Object} [scope]
-   * @returns {Events}
+   * @returns {Emitter}
    */
   stopBroadcast(event, listener, scope) {
     Broadcast.off(event, listener, scope);
@@ -182,8 +182,8 @@ export default class Events {
   /**
    * Broadcasts global event.
    * @param {string} event
-   * @param {...mixed} args
-   * @returns {Events}
+   * @param {...any} args
+   * @returns {Emitter}
    */
   broadcast(event, ...args) {
     Broadcast.fire.apply(Broadcast, arguments);
@@ -191,17 +191,17 @@ export default class Events {
   }
 
   /**
-   * Creates separate Events channel with the given `name`, if one exists then it will be returned.
+   * Creates separate Emitter channel with the given `name`, if one exists then it will be returned.
    * @param {string} name
-   * @returns {Events}
+   * @returns {Emitter}
    */
   channel(name) {
     if (! Channels.has(this)) Channels.set(this, {});
     let storage = Channels.get(this) || {}
       , channel = storage[name];
 
-    if (! (channel instanceof Events)) {
-      channel = new Events();
+    if (! (channel instanceof Emitter)) {
+      channel = new Emitter();
       storage[name] = channel;
     }
 
@@ -224,7 +224,7 @@ export default class Events {
 
   /**
    * Unbounds and clears all events.
-   * @returns {Events}
+   * @returns {Emitter}
    */
   destroy() {
     this.off();
@@ -242,7 +242,7 @@ export default class Events {
   /**
    * Unbounds and clears all Global events.
    * @param {boolean} [cleanUp]
-   * @returns {Events}
+   * @returns {Emitter}
    */
   destroyBroadcastEvents(cleanUp) {
     Broadcast.destroy(cleanUp);
@@ -251,7 +251,7 @@ export default class Events {
 
   /**
    * Resets events namespace and catalog to default values.
-   * @returns {Events}
+   * @returns {Emitter}
    */
   resetNsAndCatalog() {
     this.ns = '';
@@ -262,9 +262,9 @@ export default class Events {
 
 /**
  * Global Broadcast.
- * @type {Events}
+ * @type {Emitter}
  */
-const Broadcast = new Events();
+const Broadcast = new Emitter();
 
 /** Cache reference for the Global Broadcast. */
-Events.Broadcast = Broadcast;
+Emitter.Broadcast = Broadcast;

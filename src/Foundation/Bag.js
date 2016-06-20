@@ -28,8 +28,8 @@ export default class Bag extends Class {
   /**
    * Returns `value` at the given `key` or `defaults` if not exists.
    * @param {string} key
-   * @param {mixed} [defaults]
-   * @returns {mixed}
+   * @param {any} [defaults]
+   * @returns {any}
    */
   get(key, defaults) {
     return _.get(Items.get(this), key, defaults);
@@ -38,7 +38,7 @@ export default class Bag extends Class {
   /**
    * Sets `value` at the given `key`.
    * @param {string} key
-   * @param {mixed} value
+   * @param {any} value
    * @returns {Bag}
    */
   set(key, value) {
@@ -58,7 +58,7 @@ export default class Bag extends Class {
   /**
    * Removes and returns `value` at the given `key`.
    * @param {string} key
-   * @returns {mixed}
+   * @returns {any}
    */
   forget(key) {
     let result = this.get(key);
@@ -69,8 +69,8 @@ export default class Bag extends Class {
   /**
    * Resolves `value` by the given `key` and if `value` is function then it will be called and always returned.
    * @param {string} key
-   * @param {mixed} [defaults]
-   * @returns {mixed}
+   * @param {any} [defaults]
+   * @returns {any}
    */
   result(key, defaults) {
     return _.result(Items.get(this), key, defaults);

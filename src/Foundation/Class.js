@@ -1,13 +1,13 @@
 import * as _ from 'lodash';
-import Events from '../Events/Events';
+import Emitter from '../Events/Emitter';
 import Serializer from '../Serializer/Serializer';
 
 /**
  * Fiber Class.
  * @class
- * @extends {Events}
+ * @extends {Emitter}
  **/
-export default class Class extends Events {
+export default class Class extends Emitter {
 
   /**
    * Constructs Fiber Object.
@@ -22,8 +22,8 @@ export default class Class extends Events {
   /**
    * Returns `value` at the given `key` or `defaults` if not exists.
    * @param {string} key
-   * @param {mixed} [defaults]
-   * @returns {mixed}
+   * @param {any} [defaults]
+   * @returns {any}
    */
   get(key, defaults) {
     return _.get(this, key, defaults);
@@ -32,7 +32,7 @@ export default class Class extends Events {
   /**
    * Sets `value` at the given `key`.
    * @param {string} key
-   * @param {mixed} value
+   * @param {any} value
    * @returns {Class}
    */
   set(key, value) {
@@ -52,7 +52,7 @@ export default class Class extends Events {
   /**
    * Removes and returns `value` at the given `key`.
    * @param {string} key
-   * @returns {mixed}
+   * @returns {any}
    */
   forget(key) {
     let result = this.get(key);
@@ -63,15 +63,15 @@ export default class Class extends Events {
   /**
    * Resolves `value` by the given `key` and if `value` is function then it will be called and always returned.
    * @param {string} key
-   * @param {mixed} [defaults]
-   * @returns {mixed}
+   * @param {any} [defaults]
+   * @returns {any}
    */
   result(key, defaults) {
     return _.result(this, key, defaults);
   }
 
   /**
-   * Returns all keys.
+   * Returns all own keys.
    * @returns {Array}
    */
   keys() {
@@ -79,7 +79,7 @@ export default class Class extends Events {
   }
 
   /**
-   * Returns all values.
+   * Returns all own values.
    * @returns {Array}
    */
   values() {
@@ -87,7 +87,7 @@ export default class Class extends Events {
   }
 
   /**
-   * Returns array with keys and values.
+   * Returns array with own keys and own values.
    * @returns {Array}
    */
   entries() {
@@ -100,7 +100,7 @@ export default class Class extends Events {
    * @returns {Array}
    */
   pick(keys) {
-    return _.pick(this, keys);
+    return _.pick(this, _.castArray(keys));
   }
 
   /**
@@ -109,7 +109,7 @@ export default class Class extends Events {
    * @returns {Object}
    */
   omit(keys) {
-    return _.omit(this, keys);
+    return _.omit(this, _.castArray(keys));
   }
 
   /**

@@ -28,7 +28,7 @@ function createPrototype(ctor, proto = {}) {
 
 /**
  * Transforms plain object to Class.
- * @param {Object|mixed} proto
+ * @param {Object|any} proto
  * @return {Function}
  */
 export function Classify(proto) {
@@ -71,7 +71,7 @@ export function Multi(parent, ...args) {
  * pointing to parent constructor.
  * @param parent
  * @param proto
- * @returns {mixed}
+ * @returns {any}
  * @constructor
  */
 export function Extend(parent, proto) {
@@ -118,7 +118,7 @@ export function Instance(parent, args) {
 
 /**
  * Checks if given object is Class constructor.
- * @param {mixed} object
+ * @param {any} object
  * @returns {boolean}
  */
 export function isClass(object) {
@@ -127,7 +127,7 @@ export function isClass(object) {
 
 /**
  * Checks if given object is instance (not a Class)
- * @param {mixed} object
+ * @param {any} object
  * @returns {boolean}
  */
 export function isInstance(object) {

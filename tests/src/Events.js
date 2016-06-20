@@ -1,11 +1,11 @@
 import TestSuite from '../support/TestSuite';
-import Events  from '../../src/Events/Events';
+import Events  from '../../src/Events/Emitter';
 import chai from 'chai';
 
 const expect = chai.expect;
 const Broadcast = Events.Broadcast;
 
-var Suite = new TestSuite('Events', function () {
+var Suite = new TestSuite('Emitter', function () {
 
   before(function() {
     this.vent = new Events();
@@ -155,7 +155,7 @@ var Suite = new TestSuite('Events', function () {
     expect(stopBroadcast).to.not.be.called;
   });
 
-  it('`channel`: should create new Events channel.', function() {
+  it('`channel`: should create new Emitter channel.', function() {
     let channel = this.vent.channel('channel');
     expect(channel).to.be.instanceof(Events);
     let sameChannel = this.vent.channel('channel');

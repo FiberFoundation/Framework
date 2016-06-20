@@ -1,5 +1,5 @@
 /**
- * @typedef {mixed} mixed
+ * @typedef {any} any
  */
 
 /**

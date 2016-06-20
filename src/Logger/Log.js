@@ -77,8 +77,8 @@ export default class Log {
 
   /**
    * Logs using current level.
-   * @param {...mixed} args
-   * @returns {mixed|Log}
+   * @param {...any} args
+   * @returns {any|Log}
    */
   log(...args) {
     return this.write(this.level, args);
@@ -86,8 +86,8 @@ export default class Log {
 
   /**
    * Logs using `trace` level.
-   * @param {...mixed} args
-   * @returns {mixed|Log}
+   * @param {...any} args
+   * @returns {any|Log}
    */
   trace(...args) {
     return this.write('trace', args);
@@ -95,8 +95,8 @@ export default class Log {
 
   /**
    * Logs using `debug` level.
-   * @param {...mixed} args
-   * @returns {mixed|Log}
+   * @param {...any} args
+   * @returns {any|Log}
    */
   debug(...args) {
     return this.write('debug', args);
@@ -104,8 +104,8 @@ export default class Log {
 
   /**
    * Logs using `info` level.
-   * @param {...mixed} args
-   * @returns {mixed|Log}
+   * @param {...any} args
+   * @returns {any|Log}
    */
   info(...args) {
     return this.write('info', args);
@@ -113,8 +113,8 @@ export default class Log {
 
   /**
    * Logs using `warn` level.
-   * @param {...mixed} args
-   * @returns {mixed|Log}
+   * @param {...any} args
+   * @returns {any|Log}
    */
   warn(...args) {
     return this.write('warn', args);
@@ -122,8 +122,8 @@ export default class Log {
 
   /**
    * Logs using `error` level.
-   * @param {...mixed} args
-   * @returns {mixed|Log}
+   * @param {...any} args
+   * @returns {any|Log}
    */
   error(...args) {
     return this.write('error', args);
@@ -143,8 +143,8 @@ export default class Log {
 
   /**
    * Logs using current level.
-   * @param {...mixed} args
-   * @returns {mixed|Log}
+   * @param {...any} args
+   * @returns {any|Log}
    */
   static log(...args) {
     return Internal.write(Internal.level, args);
@@ -152,8 +152,8 @@ export default class Log {
 
   /**
    * Logs using `trace` level.
-   * @param {...mixed} args
-   * @returns {mixed|Log}
+   * @param {...any} args
+   * @returns {any|Log}
    */
   static trace(...args) {
     return Internal.write('trace', args);
@@ -161,8 +161,8 @@ export default class Log {
 
   /**
    * Logs using `debug` level.
-   * @param {...mixed} args
-   * @returns {mixed|Log}
+   * @param {...any} args
+   * @returns {any|Log}
    */
   static debug(...args) {
     return Internal.write('debug', args);
@@ -170,8 +170,8 @@ export default class Log {
 
   /**
    * Logs using `info` level.
-   * @param {...mixed} args
-   * @returns {mixed|Log}
+   * @param {...any} args
+   * @returns {any|Log}
    */
   static info(...args) {
     return Internal.write('info', args);
@@ -179,8 +179,8 @@ export default class Log {
 
   /**
    * Logs using `warn` level.
-   * @param {...mixed} args
-   * @returns {mixed|Log}
+   * @param {...any} args
+   * @returns {any|Log}
    */
   static warn(...args) {
     return Internal.write('warn', args);
@@ -188,8 +188,8 @@ export default class Log {
 
   /**
    * Logs using `error` level.
-   * @param {...mixed} args
-   * @returns {mixed|Log}
+   * @param {...any} args
+   * @returns {any|Log}
    */
   static error(...args) {
     return Internal.write('error', args);

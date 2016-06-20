@@ -1,5 +1,5 @@
 import Tags from './Support/DocTags';
-import Events from './Events/Events';
+import Events from './Events/Emitter';
 import Class from './Foundation/Class';
 import Log from './Logger/Log';
 import Monitor from './Monitor/Monitor';
