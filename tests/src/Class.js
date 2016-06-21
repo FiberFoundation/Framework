@@ -194,7 +194,7 @@ let Suite = new TestSuite('Class', function() {
       arr: [1, 2, 3]
     };
 
-    expect(this._class.serialize()).to.be.equal(JSON.stringify(this._class));
+    expect(this._class.serialize()).to.be.equal(JSON.stringify(_.omit(this._class, ['hidden', 'serializer'])));
   });
 
   it('`fromSerialize`: should unserialize from string and mix to the given Class.', function() {
@@ -217,7 +217,7 @@ let Suite = new TestSuite('Class', function() {
       arr: [1, 2, 3]
     });
 
-    expect(this._class.toPlain()).to.be.eql(_.toPlainObject(this._class));
+    expect(this._class.toPlain()).to.be.eql(_.omit(this._class, ['serializer', 'hidden']));
   });
 
   it('`destroy`: should destroy events and flush options.', function() {

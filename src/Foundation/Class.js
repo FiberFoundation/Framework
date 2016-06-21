@@ -10,6 +10,13 @@ import Serializer from '../Serializer/Serializer';
 export default class Class extends Emitter {
 
   /**
+   * Hidden properties.
+   * Will be omitted on serialization.
+   * @type {Array.<string>}
+   */
+  hidden = ['serializer', 'hidden'];
+
+  /**
    * Constructs Fiber Object.
    * @param {Object} [options={}]
    */
@@ -100,7 +107,7 @@ export default class Class extends Emitter {
    * @returns {Array}
    */
   pick(keys) {
-    return _.pick(this, _.castArray(keys));
+    return _.pick(this, keys);
   }
 
   /**
@@ -109,7 +116,7 @@ export default class Class extends Emitter {
    * @returns {Object}
    */
   omit(keys) {
-    return _.omit(this, _.castArray(keys));
+    return _.omit(this, keys);
   }
 
   /**
@@ -135,7 +142,7 @@ export default class Class extends Emitter {
    * @returns {string}
    */
   serialize() {
-    return this.serializer.serialize(this);
+    return this.serializer.serialize(this.toPlain());
   }
 
   /**
@@ -153,7 +160,7 @@ export default class Class extends Emitter {
    * @returns {Object}
    */
   toPlain() {
-    return _.toPlainObject(this);
+    return this.omit(this.hidden);
   }
 
   /**
