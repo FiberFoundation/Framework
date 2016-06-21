@@ -134,4 +134,102 @@ let Suite = new TestSuite('Class', function() {
 
     expect(this._class.omit('methods')).to.be.eql(_.omit(this._class, ['methods']));
   });
+
+  it('`merge`: should merge Class with given object.', function() {
+    this._class.methods = {
+      key: 'value',
+      obj: {objKey: 'objVal'},
+      fn: () => 1,
+      arr: [1, 2, 3]
+    };
+
+    this._class.merge({
+      newKey: 'newValue',
+      methods: {
+        key: 'value2',
+        obj: {objKey2: 'objValue2'},
+        arr: [4, 5]
+      }
+    });
+
+    expect(this._class).to.have.property('newKey');
+    expect(this._class.newKey).to.eql('newValue');
+    expect(this._class.methods).to.eql(_.merge(this._class.methods, {
+      key: 'value2',
+      obj: {objKey2: 'objValue2'},
+      arr: [4, 5]
+    }));
+  });
+
+  it('`mix`: should mix Class with given object.', function() {
+    this._class.methods = {
+      key: 'value',
+      obj: {objKey: 'objVal'},
+      fn: () => 1,
+      arr: [1, 2, 3]
+    };
+
+    this._class.mix({
+      newKey: 'newValue',
+      methods: {
+        key: 'value2',
+        obj: {objKey2: 'objValue2'},
+        arr: [4, 5]
+      }
+    });
+
+    expect(this._class).to.have.property('newKey');
+    expect(this._class.newKey).to.eql('newValue');
+    expect(this._class.methods).to.eql(_.assign(this._class.methods, {
+      key: 'value2',
+      obj: {objKey2: 'objValue2'},
+      arr: [4, 5]
+    }));
+  });
+
+  it('`serialize`: should serialize Class to string using current Adapter.', function() {
+    this._class.methods = {
+      key: 'value',
+      fn: () => 1,
+      arr: [1, 2, 3]
+    };
+
+    expect(this._class.serialize()).to.be.equal(JSON.stringify(this._class));
+  });
+
+  it('`fromSerialize`: should unserialize from string and mix to the given Class.', function() {
+    let _class = new Class({
+      key: 'value',
+      fn: () => 1,
+      arr: [1, 2, 3]
+    });
+
+    this._class.fromSerialized(_class.serialize());
+
+    expect(this._class.options.key).to.be.eql('value');
+    expect(this._class.options.arr).to.be.eql([1, 2, 3]);
+  });
+
+  it('`toPlain`: should convert Class to Plain Object.', function() {
+    this._class.mix({
+      key: 'value',
+      fn: () => 1,
+      arr: [1, 2, 3]
+    });
+
+    expect(this._class.toPlain()).to.be.eql(_.toPlainObject(this._class));
+  });
+
+  it('`destroy`: should destroy events and flush options.', function() {
+    let opts = {
+      key: 'value',
+      fn: () => 1,
+      arr: [1, 2, 3]
+    };
+
+    this._class = new Class(opts);
+    expect(this._class.options).to.be.equal(opts);
+    this._class.destroy();
+    expect(this._class.options).to.be.empty;
+  });
 });

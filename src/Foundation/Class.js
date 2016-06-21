@@ -149,13 +149,29 @@ export default class Class extends Emitter {
   }
 
   /**
+   * Converts to Plain object.
+   * @returns {Object}
+   */
+  toPlain() {
+    return _.toPlainObject(this);
+  }
+
+  /**
+   * Alias for `serialize`.
+   * @returns {string}
+   */
+  toJSON() {
+    return this.serialize();
+  }
+
+  /**
    * Destroys Base Object.
    * @returns {Class}
    * @override
    */
   destroy() {
     super.destroy();
-    this.options = null;
+    this.options = {};
     return this;
   }
 }
