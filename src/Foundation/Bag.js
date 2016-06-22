@@ -22,7 +22,7 @@ export default class Bag extends Class {
    */
   constructor(storable = {}, options = {}) {
     super(options);
-    Items.set(this, storable);
+    this.reset(storable);
   }
 
   /**
@@ -30,6 +30,7 @@ export default class Bag extends Class {
    * @param {string} key
    * @param {any} [defaults]
    * @returns {any}
+   * @override
    */
   get(key, defaults) {
     return _.get(Items.get(this), key, defaults);
@@ -37,11 +38,13 @@ export default class Bag extends Class {
 
   /**
    * Sets `value` at the given `key`.
-   * @param {string} key
-   * @param {any} value
+   * @param {string|Object} key
+   * @param {any} [value]
    * @returns {Bag}
+   * @override
    */
   set(key, value) {
+    if (_.isPlainObject(key)) return this.reset(key);
     _.set(Items.get(this), key, value);
     return this;
   }
@@ -50,6 +53,7 @@ export default class Bag extends Class {
    * Determines if key exists.
    * @param {string} key
    * @returns {boolean}
+   * @override
    */
   has(key) {
     return _.has(Items.get(this), key);
@@ -59,6 +63,7 @@ export default class Bag extends Class {
    * Removes and returns `value` at the given `key`.
    * @param {string} key
    * @returns {any}
+   * @override
    */
   forget(key) {
     let result = this.get(key);
@@ -71,6 +76,7 @@ export default class Bag extends Class {
    * @param {string} key
    * @param {any} [defaults]
    * @returns {any}
+   * @override
    */
   result(key, defaults) {
     return _.result(Items.get(this), key, defaults);
@@ -79,6 +85,7 @@ export default class Bag extends Class {
   /**
    * Returns all keys.
    * @returns {Array}
+   * @override
    */
   keys() {
     return _.keys(Items.get(this));
@@ -87,6 +94,7 @@ export default class Bag extends Class {
   /**
    * Returns all values.
    * @returns {Array}
+   * @override
    */
   values() {
     return _.values(Items.get(this));
@@ -96,6 +104,7 @@ export default class Bag extends Class {
    * Returns an object composed of the picked object `keys`.
    * @param {string|Array.<string>} keys
    * @returns {Array}
+   * @override
    */
   pick(keys) {
     return _.pick(Items.get(this), keys);
@@ -105,6 +114,7 @@ export default class Bag extends Class {
    * Returns an object with all keys that are not omitted.
    * @param {string|Array.<string>} keys
    * @returns {Object}
+   * @override
    */
   omit(keys) {
     return _.omit(Items.get(this), keys);
@@ -114,9 +124,21 @@ export default class Bag extends Class {
    * Merges object with current items.
    * @param {Object} object
    * @returns {Bag}
+   * @override
    */
   merge(object) {
-    return _.merge(Items.get(this), object);
+    this.set(super.merge.call(Items.get(this), object));
+    return this;
+  }
+
+  /**
+   * Includes mixin.
+   * @param {Object} mixin
+   * @returns {Class}
+   * @override
+   */
+  mix(mixin) {
+    return this.set(super.mix.call(Items.get(this), mixin));
   }
 
   /**
@@ -126,8 +148,18 @@ export default class Bag extends Class {
    * @returns {Bag}
    */
   each(iteratee, scope) {
-    _.each(Items.get(this), scope ? iteratee.bind(scope) : iteratee);
+    _.each(Items.get(this), scope ? iteratee::scope : iteratee);
     return this;
+  }
+
+  /**
+   * Maps items in a bag.
+   * @param {Function} iteratee
+   * @param {Object} [scope]
+   * @returns {Object}
+   */
+  map(iteratee, scope) {
+    return _.map(Items.get(this), scope ? iteratee::scope : iteratee);
   }
 
   /**
@@ -154,10 +186,11 @@ export default class Bag extends Class {
   /**
    * Clones bag items.
    * @param {boolean} [deep=true]
-   * @returns {Object}
+   * @returns {Bag}
    */
   clone(deep = true) {
-    return _[deep ? 'cloneDeep' : 'clone'](Items.get(this));
+    let fn = deep ? 'cloneDeep' : 'clone';
+    return new Bag(_[fn](Items.get(this)), _[fn](this.options));
   }
 
   /**
@@ -165,25 +198,36 @@ export default class Bag extends Class {
    * @return {Bag}
    */
   flush() {
-    Items.set(this, {});
+    return this.reset({});
+  }
+
+  /**
+   * Resets items with the given `object`
+   * @param {Object} object
+   * @returns {Bag}
+   */
+  reset(object) {
+    Items.set(this, object);
     return this;
   }
 
   /**
-   * Serializes Bag to JSON string.
-   * @returns {string}
+   * Converts to Plain object.
+   * @returns {Object}
+   * @override
    */
-  serialize() {
-    return this.serializer.serialize(Items.get(this));
+  toPlain() {
+    return this.all();
   }
 
   /**
-   * Converts and sets serialized JSON string to Bag.
-   * @param {string} json
-   * @return {Bag}
+   * Destroys Bag.
+   * @returns {Class}
+   * @override
    */
-  fromSerialized(json) {
-    Items.set(this, this.serializer.unserialize(json));
+  destroy() {
+    super.destroy();
+    this.flush();
     return this;
   }
 }

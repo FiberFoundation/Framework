@@ -6,15 +6,19 @@ let expect = chai.expect;
 
 let Suite = new TestSuite('Bag', function() {
 
-  before(function() {
-
+  beforeEach(function() {
+    this._bag = new Bag({
+      key: 'value',
+      obj: {objKey: 'objValue'},
+      arr: [1, 2, 3]
+    });
   });
 
-  after(function() {
-
+  afterEach(function() {
+    this._bag = null;
   });
 
-  it('Bag', function() {
-
+  it('`new`: should be properly constructed.', function() {
+    
   });
 });

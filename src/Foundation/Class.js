@@ -24,6 +24,7 @@ export default class Class extends Emitter {
     super(options);
     this.options = options;
     this.serializer = new Serializer(options.serializeAdapter);
+    if (options.hidden) this.hidden = _.uniq(this.hidden.concat(options.hidden));
   }
 
   /**

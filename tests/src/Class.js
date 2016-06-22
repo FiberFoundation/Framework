@@ -12,7 +12,7 @@ let Suite = new TestSuite('Class', function() {
   });
 
   afterEach(function() {
-    this._class.destroy();
+    this._class = null;
   });
 
   it('`new`: should be properly constructed.', function() {
