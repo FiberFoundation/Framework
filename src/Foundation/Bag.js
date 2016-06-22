@@ -33,7 +33,7 @@ export default class Bag extends Class {
    * @override
    */
   get(key, defaults) {
-    return _.get(Items.get(this), key, defaults);
+    return _.get(this.all(), key, defaults);
   }
 
   /**
@@ -45,7 +45,7 @@ export default class Bag extends Class {
    */
   set(key, value) {
     if (_.isPlainObject(key)) return this.reset(key);
-    _.set(Items.get(this), key, value);
+    _.set(this.all(), key, value);
     return this;
   }
 
@@ -56,7 +56,7 @@ export default class Bag extends Class {
    * @override
    */
   has(key) {
-    return _.has(Items.get(this), key);
+    return _.has(this.all(), key);
   }
 
   /**
@@ -67,7 +67,7 @@ export default class Bag extends Class {
    */
   forget(key) {
     let result = this.get(key);
-    _.unset(Items.get(this), key);
+    _.unset(this.all(), key);
     return result;
   }
 
@@ -79,7 +79,7 @@ export default class Bag extends Class {
    * @override
    */
   result(key, defaults) {
-    return _.result(Items.get(this), key, defaults);
+    return _.result(this.all(), key, defaults);
   }
 
   /**
@@ -88,7 +88,7 @@ export default class Bag extends Class {
    * @override
    */
   keys() {
-    return _.keys(Items.get(this));
+    return _.keys(this.all());
   }
 
   /**
@@ -97,7 +97,7 @@ export default class Bag extends Class {
    * @override
    */
   values() {
-    return _.values(Items.get(this));
+    return _.values(this.all());
   }
 
   /**
@@ -107,7 +107,7 @@ export default class Bag extends Class {
    * @override
    */
   pick(keys) {
-    return _.pick(Items.get(this), keys);
+    return _.pick(this.all(), keys);
   }
 
   /**
@@ -117,7 +117,7 @@ export default class Bag extends Class {
    * @override
    */
   omit(keys) {
-    return _.omit(Items.get(this), keys);
+    return _.omit(this.all(), keys);
   }
 
   /**
@@ -127,7 +127,7 @@ export default class Bag extends Class {
    * @override
    */
   merge(object) {
-    this.set(super.merge.call(Items.get(this), object));
+    this.set(super.merge.call(this.all(), object));
     return this;
   }
 
@@ -138,7 +138,7 @@ export default class Bag extends Class {
    * @override
    */
   mix(mixin) {
-    return this.set(super.mix.call(Items.get(this), mixin));
+    return this.set(super.mix.call(this.all(), mixin));
   }
 
   /**
@@ -148,7 +148,7 @@ export default class Bag extends Class {
    * @returns {Bag}
    */
   each(iteratee, scope) {
-    _.each(Items.get(this), scope ? iteratee::scope : iteratee);
+    _.each(this.all(), scope ? iteratee::scope : iteratee);
     return this;
   }
 
@@ -159,7 +159,7 @@ export default class Bag extends Class {
    * @returns {Object}
    */
   map(iteratee, scope) {
-    return _.map(Items.get(this), scope ? iteratee::scope : iteratee);
+    return _.map(this.all(), scope ? iteratee::scope : iteratee);
   }
 
   /**
@@ -170,7 +170,7 @@ export default class Bag extends Class {
    */
   transform(iteratee, scope) {
     iteratee = scope ? iteratee::scope : iteratee
-    let items = Items.get(this);
+    let items = this.all();
     for (let key in items) items[key] = iteratee(items[key], key, items);
     return this;
   }
@@ -190,7 +190,7 @@ export default class Bag extends Class {
    */
   clone(deep = true) {
     let fn = deep ? 'cloneDeep' : 'clone';
-    return new Bag(_[fn](Items.get(this)), _[fn](this.options));
+    return new Bag(_[fn](this.all()), _[fn](this.options));
   }
 
   /**
