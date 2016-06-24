@@ -1,5 +1,6 @@
 import Class from './Class';
 import * as _ from 'lodash';
+import Immutable from 'immutable';
 
 /**
  * Items storage.
@@ -45,7 +46,7 @@ export default class Bag extends Class {
    */
   set(key, value) {
     if (_.isPlainObject(key)) return this.reset(key);
-    _.set(this.all(), key, value);
+    this.reset(_.set(this.all(), key, value));
     return this;
   }
 
@@ -66,8 +67,9 @@ export default class Bag extends Class {
    * @override
    */
   forget(key) {
-    let result = this.get(key);
-    _.unset(this.all(), key);
+    let result = this.get(key), all = this.all();
+    _.unset(all, key);
+    this.reset(all);
     return result;
   }
 
@@ -78,7 +80,7 @@ export default class Bag extends Class {
    * @returns {any}
    * @override
    */
-  result(key, defaults) {
+  retrieve(key, defaults) {
     return _.result(this.all(), key, defaults);
   }
 
@@ -127,7 +129,7 @@ export default class Bag extends Class {
    * @override
    */
   merge(object) {
-    this.set(super.merge.call(this.all(), object));
+    this.reset(_.merge(this.all(), object));
     return this;
   }
 
@@ -138,7 +140,7 @@ export default class Bag extends Class {
    * @override
    */
   mix(mixin) {
-    return this.set(super.mix.call(this.all(), mixin));
+    return this.reset(_.assign(this.all(), mixin));
   }
 
   /**
@@ -180,7 +182,7 @@ export default class Bag extends Class {
    * @returns {Object}
    */
   all() {
-    return Items.get(this);
+    return Items.get(this).toObject();
   }
 
   /**
@@ -207,7 +209,7 @@ export default class Bag extends Class {
    * @returns {Bag}
    */
   reset(object) {
-    Items.set(this, object);
+    Items.set(this, Immutable.Map(object));
     return this;
   }
 

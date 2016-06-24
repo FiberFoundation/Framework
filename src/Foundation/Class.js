@@ -74,7 +74,7 @@ export default class Class extends Emitter {
    * @param {any} [defaults]
    * @returns {any}
    */
-  result(key, defaults) {
+  retrieve(key, defaults) {
     return _.result(this, key, defaults);
   }
 

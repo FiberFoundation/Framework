@@ -72,16 +72,16 @@ let Suite = new TestSuite('Class', function() {
     expect(this._class.methods.arr).to.be.eql([, 2, 3]);
   });
 
-  it('`result`: should retrieve value at a path and if is function then call it.', function() {
+  it('`retrieve`: should retrieve value at a path and if is function then call it.', function() {
     this._class.methods = {
       key: 'value',
       fn: () => 1,
       arr: [1, 2, 3]
     };
 
-    expect(this._class.result('methods.key')).to.be.eql('value');
-    expect(this._class.result('methods.arr[0]')).to.be.eql(1);
-    expect(this._class.result('methods.fn')).to.be.eql(1);
+    expect(this._class.retrieve('methods.key')).to.be.eql('value');
+    expect(this._class.retrieve('methods.arr[0]')).to.be.eql(1);
+    expect(this._class.retrieve('methods.fn')).to.be.eql(1);
   });
 
   it('`keys`: should return all own keys.', function() {
