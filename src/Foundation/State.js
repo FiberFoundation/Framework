@@ -16,88 +16,12 @@ export let CloudStates = new WeakMap();
 export default class State extends Emitter {
 
   /**
-   * Reference to the `Cloud` States.
-   * @type {WeakMap}
-   * @static
-   */
-  static Cloud = CloudStates;
-
-  /**
-   * Determines if given object is State.
-   * @param {any} state
-   * @returns {boolean}
-   * @static
-   */
-  static isState(state) {
-    return state instanceof State;
-  }
-
-  /**
-   * Determines if given object is ImmutableMap.
-   * @param {any} object
-   * @returns {boolean}
-   * @static
-   */
-  static isMap(object) {
-    return Map.isMap(object);
-  }
-
-  /**
-   * Value equality check with semantics similar to Object.is, but treats Immutable State as values,
-   * equal if the second State includes equivalent values.
-   * @param {Immutable} first
-   * @param {Immutable} second
-   * @returns {boolean}
-   * @static
-   */
-  static is(first, second) {
-    [first, second] = [first, second].map(one => State.prepareToReset(one));
-    return Immutable.is(first, second);
-  }
-
-  /**
-   * Creates new State from alternating object and options.
-   * @param {Object} [object]
-   * @param {Object} [options]
-   * @returns {State}
-   * @static
-   */
-  static of(object, options) {
-    return new State(object, options);
-  }
-
-  /**
-   * Resets `State` of the scope to the given `Map`.
-   * @param {State} Scope
-   * @param {State|ImmutableMap|Object} object
-   * @param {boolean} [prepare=false]
-   * @returns {State}
-   * @static
-   */
-  static reset(Scope, object, prepare = false) {
-    CloudStates.set(Scope, prepare ? State.prepareToReset(object) : object);
-    return Scope;
-  }
-
-  /**
-   * Prepares `Object` to reset State.
-   * @param {State|ImmutableMap|Object} object
-   * @returns {ImmutableMap}
-   * @static
-   */
-  static prepareToReset(object) {
-    if (State.isState(object)) object = object.current;
-    return Map(object);
-  }
-
-  /**
    * Constructs State.
    * @param {Object|ImmutableMap} [state]
    * @param {Object} [options={}]
    */
   constructor(state, options = {}) {
     super(options);
-    this.options = _.clone(options);
     State.reset(this, state, true);
   }
 
@@ -107,6 +31,15 @@ export default class State extends Emitter {
    */
   get size() {
     return this.current.size;
+  }
+
+  /**
+   * Sets new size for `State`.
+   * Internally `take()` will be called.
+   * @param {number} newSize
+   */
+  set size(newSize) {
+    State.reset(this, this.current.take(newSize));
   }
 
   /**
@@ -133,13 +66,11 @@ export default class State extends Emitter {
    */
   get(key, defaults) {
     if (! arguments.length) return this.current;
-
     if (this.isPath(key)) {
       var result = this.current.getIn(this.toPath(key));
     } else {
       result = this.current.get(key);
     }
-
     return result !== void 0 ? result : defaults;
   }
 
@@ -150,18 +81,24 @@ export default class State extends Emitter {
    * @returns {State}
    */
   set(key, value) {
-    if (this.has(key)) return this.update(key, value);
     let current = this.current;
+    this.fire('changing', key, value, this);
 
-    this.fire('changing', key, value, current, this);
-
-    if (this.isPath(key)) {
+    if (arguments.length === 1) {
+      if (State.isState(key)) key = key.current.toObject();
+      State.reset(this, current.mergeDeep(key));
+      _.entries(key).forEach(([oneKey, oneValue]) => {
+        this.fire('changed:' + oneKey, oneValue, this);
+      });
+    } else if (this.isPath(key)) {
       State.reset(this, current.setIn(this.toPath(key), value));
+      this.fire('changed:' + key, value, this);
     } else {
       State.reset(this, current.set(key, value));
+      this.fire('changed:' + key, value, this);
     }
 
-    this.fire('changed', key, value, this.current, this);
+    this.fire('changed', key, value, this);
     return this;
   }
 
@@ -183,65 +120,81 @@ export default class State extends Emitter {
     let value = this.get(key);
     let current = this.current;
 
-    this.fire('forgetting', key, value, current, this);
+    this.fire('forgetting', key, value, this);
 
     if (this.isPath(key)) {
       State.reset(this, current.deleteIn(this.toPath(key)));
+      this.fire('forgot:' + key, value, this);
     } else {
       State.reset(this, current.delete(key));
+      this.fire('forgot:' + key, value, this);
     }
 
-    this.fire('forgot', key, value, this.current, this);
+    this.fire('forgot', key, value, this);
     return value;
   }
 
   /**
+   * Mutates State with the given `mutator`.
+   * Every time you call one of the above functions, a new immutable Map is created.
+   * If a pure function calls a number of these to produce a final return value,
+   * then a penalty on performance and memory has been paid by creating all of the intermediate immutable Maps.
+   * If you need to apply a series of mutations to produce a new immutable Map,
+   * `mutate()` creates a temporary mutable copy of the Map which can apply mutations
+   * in a highly performant manner. In fact, this is exactly how complex mutations like merge are done.
+   * @param {Function} mutator
+   * @returns {State}
+   */
+  mutate(mutator) {
+    let previous = this.current.all();
+    let state = new State(this.current.withMutations(mutator));
+    this.fire('mutated', previous, state, this);
+    return state;
+  }
+
+  /**
    * Returns all keys in an Array/ImmutableList.
-   * @param {boolean} [toArray=true]
+   * @param {boolean} [toArray=false]
    * @returns {Array|ImmutableList}
    */
-  keys(toArray = true) {
+  keys(toArray = false) {
     let it = this.current.keys();
     return toArray ? it.toArray() : List.of(it);
   }
 
   /**
    * Returns all values in an Array/ImmutableList.
-   * @param {boolean} [toArray=true]
+   * @param {boolean} [toArray=false]
    * @returns {Array|ImmutableList}
    */
-  values(toArray = true) {
+  values(toArray = false) {
     let it = this.current.values();
     return toArray ? it.toArray() : List.of(it);
   }
 
   /**
    * Returns all keys and values in a single Array/ImmutableList.
-   * @param {boolean} [toArray=true]
+   * @param {boolean} [toArray=false]
    * @returns {Array|ImmutableList}
    */
-  entries(toArray = true) {
+  entries(toArray = false) {
     let it = this.current.entries();
     return toArray ? it.toArray() : List.of(it);
   }
 
   /**
-   * Updates current State at a `key` with the `value`.
-   * @param {string} key
-   * @param {any} value
+   * Updates current State at a `key` with the `updater`, it can be a function that will update current value.
+   * @param {string|Function} key
+   * @param {any|Function} [updater]
    * @returns {State}
    */
-  update(key, value) {
+  update(key, updater) {
     let current = this.current;
-    this.fire('updating', key, value, current, this);
-
     if (this.isPath(key)) {
-      State.reset(this, current.updateIn(this.toPath(key), value));
+      State.reset(this, current.updateIn(this.toPath(key), updater));
     } else {
-      State.reset(this, current.update(key, value));
+      State.reset(this, current.update(key, updater));
     }
-
-    this.fire('updated', key, value, this.current, this);
     return this;
   }
 
@@ -371,10 +324,11 @@ export default class State extends Emitter {
    * Returns the number of entries iterated (including the last iteration which returned false).
    * @param {Function} iteratee
    * @param {Object} [scope]
-   * @returns {number}
+   * @returns {State}
    */
   forEach(iteratee, scope) {
-    return this.current.forEach(iteratee, scope);
+    this.current.forEach(iteratee, scope);
+    return this;
   }
 
   /**
@@ -644,7 +598,7 @@ export default class State extends Emitter {
    * @override
    */
   getSerializable() {
-    return this.current.toObject();
+    return this.current.toJS();
   }
 
   /**
@@ -653,6 +607,71 @@ export default class State extends Emitter {
    */
   * iterator() {
     let all = this.toPlain();
-    for (let key in all) yield [key, all[key]];
+    let ownKeys = Reflect.ownKeys(all);
+    for (let key of ownKeys) yield [key, all[key]];
+  }
+
+  /**
+   * Reference to the `Cloud` States.
+   * @type {WeakMap}
+   * @static
+   */
+  static Cloud = CloudStates;
+
+  /**
+   * Determines if given object is State.
+   * @param {any} state
+   * @returns {boolean}
+   * @static
+   */
+  static isState(state) {
+    return state instanceof State;
+  }
+
+  /**
+   * Value equality check with semantics similar to Object.is, but treats Immutable State as values,
+   * equal if the second State includes equivalent values.
+   * @param {Immutable} first
+   * @param {Immutable} second
+   * @returns {boolean}
+   * @static
+   */
+  static is(first, second) {
+    [first, second] = [first, second].map(one => State.toImmutable(one));
+    return Immutable.is(first, second);
+  }
+
+  /**
+   * Creates new State from alternating object and options.
+   * @param {Object} [object]
+   * @param {Object} [options]
+   * @returns {State}
+   * @static
+   */
+  static of(object, options) {
+    return new State(object, options);
+  }
+
+  /**
+   * Resets `State` of the scope to the given `Map`.
+   * @param {State} instance
+   * @param {State|ImmutableMap|Object} state
+   * @param {boolean} [prepare=false]
+   * @returns {State}
+   * @static
+   */
+  static reset(instance, state, prepare = false) {
+    CloudStates.set(instance, prepare ? State.toImmutable(state) : state);
+    return instance;
+  }
+
+  /**
+   * Prepares `Object` to reset State, internally converts to Immutable Map.
+   * @param {State|ImmutableMap|Object} object
+   * @returns {ImmutableMap}
+   * @static
+   */
+  static toImmutable(object) {
+    return Map(State.isState(object) && object.current || object);
   }
 }

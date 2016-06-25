@@ -1,5 +1,4 @@
-import Class from '../Foundation/Class';
-import Bag from '../Foundation/Bag';
+import State from '../Foundation/State';
 import * as _ from 'lodash';
 
 /**
@@ -11,16 +10,13 @@ export const RESOLVABLE_POSTFIX = '!';
 /**
  * Fiber Inverse Of Control Container
  * @class
- * @extends {Class}
  */
-export default class Container extends Class {
+export default class Container {
 
   /**
    * Constructs Container
-   * @param {Object} [options]
    */
-  constructor(options) {
-    super(options);
+  constructor() {
     this.flush();
   }
 
@@ -29,9 +25,9 @@ export default class Container extends Class {
    * @returns {Container}
    */
   flush() {
-    this.bindings = new Bag();
-    this.instances = new Bag();
-    this.aliases = new Bag();
+    this.bindings = new State();
+    this.instances = new State();
+    this.aliases = new State();
     return this;
   }
 
@@ -120,14 +116,7 @@ export default class Container extends Class {
     if (! isClass) return concrete;
 
     return function() {
-      let args = arguments;
-
-      function InstanceCreator() {
-        return concrete.apply(this, args);
-      };
-
-      InstanceCreator.prototype = concrete.prototype;
-      return new InstanceCreator();
+      return Reflect.construct(concrete, arguments);
     };
   }
 
@@ -198,8 +187,8 @@ export default class Container extends Class {
   isResolvable(parameter) {
     if (! _.isString(parameter)) return false;
 
-    if (parameter.charAt(parameter.length - 1) === RESOLVABLE_POSTFIX) {
-      parameter = parameter.slice(0, parameter.length - 2);
+    if (_.endsWith(parameter, RESOLVABLE_POSTFIX)) {
+      parameter = _.trimEnd(parameter, RESOLVABLE_POSTFIX);
     }
 
     return this.isBound(parameter) || this.isShared(parameter) || this.isAlias(parameter);

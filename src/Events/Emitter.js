@@ -28,7 +28,7 @@ export default class Emitter extends Serializable {
    * @type {Object}
    */
   catalog = {};
-  
+
   /**
    * Flag to enable/disable events to trigger.
    * @type {boolean}
@@ -41,6 +41,7 @@ export default class Emitter extends Serializable {
    */
   constructor(options = {ns: '', catalog: {}}) {
     super(options);
+    this.options = _.clone(options);
     this.resetNsAndCatalog(options);
     if (options.allowedToEmit) this.allowedToEmit = options.allowedToEmit;
   }
@@ -281,10 +282,20 @@ export default class Emitter extends Serializable {
 };
 
 /**
- * Global Broadcast.
+ * Broadcast.
  * @type {Emitter}
  */
 const Broadcast = new Emitter();
 
 /** Cache reference for the Global Broadcast. */
 Emitter.Broadcast = Broadcast;
+
+/**
+ * Event Pipeline.
+ * @type {Emitter}
+ */
+const Pipeline = new Emitter();
+
+/** Cache reference for the Pipeline. */
+Emitter.Pipeline = Pipeline;
+

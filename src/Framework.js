@@ -1,9 +1,9 @@
+import 'babel-polyfill';
 import Tags from './Support/DocTags';
 import Serializer from './Serializer/Serializer';
 import Serializable from './Foundation/Serializable';
 import Emitter from './Events/Emitter';
 import Class from './Foundation/Class';
-import Bag from './Foundation/Bag';
 import State from './Foundation/State';
 import Model from './Model/Model';
 import Log from './Logger/Log';
@@ -20,7 +20,6 @@ let Framework = {
   Serializable,
   Emitter,
   Class,
-  Bag,
   State,
   Model,
   Log,

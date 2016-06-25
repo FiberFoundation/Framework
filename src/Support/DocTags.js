@@ -24,33 +24,38 @@
  */
 
 /**
+ * Immutable Iterable Type.
+ * @typedef {Iterable<any>|Iterable<any, any>|Immutable.Iterable} ImmutableIterable
+ */
+
+/**
  * Immutable List Type.
- * @typedef {List<any>|Immutable.List} ImmutableList
+ * @typedef {List<any>|Immutable.List|ImmutableIterable} ImmutableList
  */
 
 /**
  * Immutable Stack Type.
- * @typedef {Stack<any>|Immutable.Stack} ImmutableStack
+ * @typedef {Stack<any>|Immutable.Stack|ImmutableIterable} ImmutableStack
  */
 
 /**
  * Immutable Map Type.
- * @typedef {Map<any, any>|Immutable.Map} ImmutableMap
+ * @typedef {Map<any, any>|Immutable.Map|ImmutableIterable} ImmutableMap
  */
 
 /**
  * Immutable Ordered Map Type.
- * @typedef {OrderedMap<any, any>|Immutable.OrderedMap} ImmutableOrderedMap
+ * @typedef {OrderedMap<any, any>|Immutable.OrderedMap|ImmutableIterable} ImmutableOrderedMap
  */
 
 /**
  * Immutable Set Type.
- * @typedef {Set<any>|Immutable.Set} ImmutableSet
+ * @typedef {Set<any>|Immutable.Set|ImmutableIterable} ImmutableSet
  */
 
 /**
  * Immutable Ordered Set Type.
- * @typedef {OrderedSet<any>|Immutable.OrderedSet} ImmutableOrderedSet
+ * @typedef {OrderedSet<any>|Immutable.OrderedSet|ImmutableIterable} ImmutableOrderedSet
  */
 
 /**
