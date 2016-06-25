@@ -1,6 +1,5 @@
 import Class from './Class';
 import * as _ from 'lodash';
-import Immutable from 'immutable';
 
 /**
  * Items storage.
@@ -18,10 +17,10 @@ export default class Bag extends Class {
 
   /**
    * Constructs Bag.
-   * @param {Object} [storable={}]
-   * @param {Object} [options={}]
+   * @param {Object} [storable]
+   * @param {Object} [options]
    */
-  constructor(storable = {}, options = {}) {
+  constructor(storable, options) {
     super(options);
     this.reset(storable);
   }
@@ -34,7 +33,7 @@ export default class Bag extends Class {
    * @override
    */
   get(key, defaults) {
-    return _.get(this.all(), key, defaults);
+    return _.get(this.toPlain(), key, defaults);
   }
 
   /**
@@ -46,7 +45,7 @@ export default class Bag extends Class {
    */
   set(key, value) {
     if (_.isPlainObject(key)) return this.reset(key);
-    this.reset(_.set(this.all(), key, value));
+    this.reset(_.set(this.toPlain(), key, value));
     return this;
   }
 
@@ -57,7 +56,7 @@ export default class Bag extends Class {
    * @override
    */
   has(key) {
-    return _.has(this.all(), key);
+    return _.has(this.toPlain(), key);
   }
 
   /**
@@ -67,7 +66,7 @@ export default class Bag extends Class {
    * @override
    */
   forget(key) {
-    let result = this.get(key), all = this.all();
+    let result = this.get(key), all = this.toPlain();
     _.unset(all, key);
     this.reset(all);
     return result;
@@ -81,7 +80,7 @@ export default class Bag extends Class {
    * @override
    */
   retrieve(key, defaults) {
-    return _.result(this.all(), key, defaults);
+    return _.result(this.toPlain(), key, defaults);
   }
 
   /**
@@ -90,7 +89,7 @@ export default class Bag extends Class {
    * @override
    */
   keys() {
-    return _.keys(this.all());
+    return _.keys(this.toPlain());
   }
 
   /**
@@ -99,7 +98,7 @@ export default class Bag extends Class {
    * @override
    */
   values() {
-    return _.values(this.all());
+    return _.values(this.toPlain());
   }
 
   /**
@@ -109,7 +108,7 @@ export default class Bag extends Class {
    * @override
    */
   pick(keys) {
-    return _.pick(this.all(), keys);
+    return _.pick(this.toPlain(), keys);
   }
 
   /**
@@ -119,7 +118,7 @@ export default class Bag extends Class {
    * @override
    */
   omit(keys) {
-    return _.omit(this.all(), keys);
+    return _.omit(this.toPlain(), keys);
   }
 
   /**
@@ -129,7 +128,7 @@ export default class Bag extends Class {
    * @override
    */
   merge(object) {
-    this.reset(_.merge(this.all(), object));
+    this.reset(_.merge(this.toPlain(), object));
     return this;
   }
 
@@ -140,7 +139,7 @@ export default class Bag extends Class {
    * @override
    */
   mix(mixin) {
-    return this.reset(_.assign(this.all(), mixin));
+    return this.reset(_.assign(this.toPlain(), mixin));
   }
 
   /**
@@ -150,7 +149,7 @@ export default class Bag extends Class {
    * @returns {Bag}
    */
   each(iteratee, scope) {
-    _.each(this.all(), scope ? iteratee::scope : iteratee);
+    _.each(this.toPlain(), scope ? iteratee::scope : iteratee);
     return this;
   }
 
@@ -161,7 +160,7 @@ export default class Bag extends Class {
    * @returns {Object}
    */
   map(iteratee, scope) {
-    return _.map(this.all(), scope ? iteratee::scope : iteratee);
+    return _.map(this.toPlain(), scope ? iteratee::scope : iteratee);
   }
 
   /**
@@ -172,7 +171,7 @@ export default class Bag extends Class {
    */
   transform(iteratee, scope) {
     iteratee = scope ? iteratee::scope : iteratee
-    let items = this.all();
+    let items = this.toPlain();
     for (let key in items) items[key] = iteratee(items[key], key, items);
     return this;
   }
@@ -182,17 +181,15 @@ export default class Bag extends Class {
    * @returns {Object}
    */
   all() {
-    return Items.get(this).toObject();
+    return this.toPlain();
   }
 
   /**
    * Clones bag items.
-   * @param {boolean} [deep=true]
    * @returns {Bag}
    */
-  clone(deep = true) {
-    let fn = deep ? 'cloneDeep' : 'clone';
-    return new Bag(_[fn](this.all()), _[fn](this.options));
+  clone() {
+    return new Bag(this.toPlain(), this.options);
   }
 
   /**
@@ -200,16 +197,16 @@ export default class Bag extends Class {
    * @return {Bag}
    */
   flush() {
-    return this.reset({});
+    return this.reset();
   }
 
   /**
    * Resets items with the given `object`
-   * @param {Object} object
+   * @param {Object} [object={}]
    * @returns {Bag}
    */
-  reset(object) {
-    Items.set(this, Immutable.Map(object));
+  reset(object = {}) {
+    Items.set(this, object);
     return this;
   }
 
@@ -219,7 +216,7 @@ export default class Bag extends Class {
    * @override
    */
   toPlain() {
-    return this.all();
+    return Items.get(this);
   }
 
   /**
@@ -231,5 +228,13 @@ export default class Bag extends Class {
     super.destroy();
     this.flush();
     return this;
+  }
+
+  /**
+   * Returns Bag size.
+   * @returns {number}
+   */
+  get size() {
+    return _.size(this.all());
   }
 }

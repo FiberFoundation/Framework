@@ -6,7 +6,8 @@
   "scripts": {
     "build": "webpack --mode=build",
     "dev": "webpack --progress --colors --watch --mode=dev",
-    "serve": "webpack-dev-server --mode=test --inline --hot --content-base ./tests/manual",
+    "serve": "webpack-dev-server --mode=test --inline --content-base ./tests/manual",
+    "serve:hot": "npm run serve -- --hot",
     "start": "npm run serve",
     "stop": "npm run clean",
     "build:test": "webpack --progress --colors --mode=test",
@@ -51,7 +52,8 @@
     "immutable": "^3.8.1",
     "lodash": "^4.12.0",
     "ractive": "^0.7.3",
-    "superagent": "^1.8.3"
+    "superagent": "^1.8.3",
+    "transit-js": "^0.8.846"
   },
   "devDependencies": {
     "babel": "^6.5.2",

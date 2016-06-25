@@ -18,7 +18,9 @@ let Suite = new TestSuite('Class', function() {
   it('`new`: should be properly constructed.', function() {
     expect(this._class).to.have.property('options');
     expect(this._class.options).to.be.eql({});
+
     this._class = new Class({custom: true});
+
     expect(this._class.options).to.have.property('custom');
     expect(this._class.serializer).to.be.instanceof(Serializer);
   });
@@ -228,7 +230,8 @@ let Suite = new TestSuite('Class', function() {
     };
 
     this._class = new Class(opts);
-    expect(this._class.options).to.be.equal(opts);
+    expect(this._class.options).to.be.eql(opts);
+    expect(this._class.options).to.not.be.equal(opts);
     this._class.destroy();
     expect(this._class.options).to.be.empty;
   });

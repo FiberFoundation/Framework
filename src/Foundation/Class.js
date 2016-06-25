@@ -1,20 +1,12 @@
-import * as _ from 'lodash';
 import Emitter from '../Events/Emitter';
-import Serializer from '../Serializer/Serializer';
+import * as _ from 'lodash';
 
 /**
  * Fiber Class.
  * @class
- * @extends {Emitter}
+ * @extends Emitter
  **/
 export default class Class extends Emitter {
-
-  /**
-   * Hidden properties.
-   * Will be omitted on serialization.
-   * @type {Array.<string>}
-   */
-  hidden = ['serializer', 'hidden'];
 
   /**
    * Constructs Fiber Object.
@@ -22,9 +14,7 @@ export default class Class extends Emitter {
    */
   constructor(options = {}) {
     super(options);
-    this.options = options;
-    this.serializer = new Serializer(options.serializeAdapter);
-    if (options.hidden) this.hidden = _.uniq(this.hidden.concat(options.hidden));
+    this.options = _.clone(options);
   }
 
   /**
@@ -136,40 +126,6 @@ export default class Class extends Emitter {
    */
   mix(mixin) {
     return _.assign(this, mixin);
-  }
-
-  /**
-   * Serializes Bag to JSON string.
-   * @returns {string}
-   */
-  serialize() {
-    return this.serializer.serialize(this.toPlain());
-  }
-
-  /**
-   * Converts and sets serialized JSON string to Bag.
-   * @param {string} json
-   * @returns {Class}
-   */
-  fromSerialized(json) {
-    this.mix(this.serializer.unserialize(json));
-    return this;
-  }
-
-  /**
-   * Converts to Plain object.
-   * @returns {Object}
-   */
-  toPlain() {
-    return this.omit(this.hidden);
-  }
-
-  /**
-   * Alias for `serialize`.
-   * @returns {string}
-   */
-  toJSON() {
-    return this.serialize();
   }
 
   /**

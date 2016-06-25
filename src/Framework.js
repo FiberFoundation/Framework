@@ -1,25 +1,29 @@
 import Tags from './Support/DocTags';
-import Events from './Events/Emitter';
+import Serializer from './Serializer/Serializer';
+import Serializable from './Foundation/Serializable';
+import Emitter from './Events/Emitter';
 import Class from './Foundation/Class';
+import Bag from './Foundation/Bag';
+import State from './Foundation/State';
 import Log from './Logger/Log';
 import Monitor from './Monitor/Monitor';
-import Bag from './Foundation/Bag';
 import Container from './Container/Container';
-import Serializer from './Serializer/Serializer';
-import * as Mixins from './Mixins/Extend';
+import * as Mixins from './Support/Extend';
 
 /**
  * Fiber Framework
  * @type {Framework}
  */
 let Framework = {
-  Events,
+  Serializer,
+  Serializable,
+  Emitter,
   Class,
   Bag,
+  State,
   Log,
   Monitor,
   Container,
-  Serializer,
   Mixins,
 };
 

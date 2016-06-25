@@ -1,3 +1,4 @@
+import Serializable from '../Foundation/Serializable';
 import Vent from './Support';
 import * as _ from 'lodash';
 
@@ -13,17 +14,27 @@ let Channels = new WeakMap();
  * Fiber Emitter.
  * @class
  */
-export default class Emitter {
+export default class Emitter extends Serializable {
+
+  /**
+   * Emitter Namespace.
+   * @type {string}
+   */
+  ns = '';
+
+  /**
+   * Events catalog.
+   * @type {Object}
+   */
+  catalog = {};
 
   /**
    * Constructs Events.
-   * @param {{ns: string, catalog: Object}} [options={ns:'',catalog:{}}] - Options object.
+   * @param {Object} [options={ns:'',catalog:{}}] - Options object.
    */
-  constructor({ns, catalog} = {ns: '', catalog: {}}) {
-    /** @type {string} */
-    this.ns = ns || '';
-    /** @type {Object} */
-    this.catalog = catalog || {};
+  constructor(options = {ns: '', catalog: {}}) {
+    super(options);
+    this.resetNsAndCatalog(options);
   }
 
   /**
@@ -251,11 +262,12 @@ export default class Emitter {
 
   /**
    * Resets events namespace and catalog to default values.
+   * @param {{ns:string,catalog:Object}} [options={}]
    * @returns {Emitter}
    */
-  resetNsAndCatalog() {
-    this.ns = '';
-    this.catalog = {};
+  resetNsAndCatalog({ns, catalog} = {}) {
+    this.ns = ns || '';
+    this.catalog = catalog || {};
     return this;
   }
 };

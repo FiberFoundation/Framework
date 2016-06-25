@@ -1,6 +1,6 @@
 import AbstractParser from './AbstractParser';
 import SerializeAdapter from './SerializeAdapter';
-import JsonSerializeAdapter from './JsonSerializeAdapter';
+import JsonAdapter from './JsonAdapter';
 import Log from '../Logger/Log';
 
 /**
@@ -10,7 +10,13 @@ import Log from '../Logger/Log';
 export default class Serializer {
 
   /**
-   * Parsers
+   * Serialize Adapter instance.
+   * @type {SerializeAdapter}
+   */
+  adapter = new JsonAdapter();
+
+  /**
+   * Parsers.
    * @type {Object}
    * @static
    */
@@ -19,22 +25,21 @@ export default class Serializer {
   };
 
   /**
-   * Adapters
+   * Adapters.
    * @type {Object}
    * @static
    */
   static Adapters = {
-    Serialize: SerializeAdapter,
-    JsonSerialize: JsonSerializeAdapter
+    Adapter: SerializeAdapter,
+    Json: JsonAdapter
   };
 
   /**
    * Constructs Serializer.
-   * @param {SerializeAdapter} [adapter=JsonSerializeAdapter]
+   * @param {SerializeAdapter} [adapter=JsonAdapter]
    */
-  constructor(adapter = new JsonSerializeAdapter()) {
+  constructor(adapter = new JsonAdapter()) {
     if (adapter instanceof SerializeAdapter) {
-      /** @type {SerializeAdapter} */
       this.adapter = adapter;
     }
   }
