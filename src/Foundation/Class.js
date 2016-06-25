@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 /**
  * Fiber Class.
  * @class
- * @extends Emitter
+ * @extends {Emitter}
  **/
 export default class Class extends Emitter {
 
@@ -129,7 +129,7 @@ export default class Class extends Emitter {
   }
 
   /**
-   * Destroys Base Object.
+   * Destroys Class.
    * @returns {Class}
    * @override
    */

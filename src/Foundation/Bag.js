@@ -2,11 +2,10 @@ import Class from './Class';
 import * as _ from 'lodash';
 
 /**
- * Items storage.
+ * Bags storage.
  * @type {WeakMap}
- * @private
  */
-let Items = new WeakMap();
+export let Bags = new WeakMap();
 
 /**
  * Fiber Bag
@@ -23,6 +22,14 @@ export default class Bag extends Class {
   constructor(storable, options) {
     super(options);
     this.reset(storable);
+  }
+
+  /**
+   * Returns Bag size.
+   * @returns {number}
+   */
+  get size() {
+    return _.size(this.toPlain());
   }
 
   /**
@@ -149,7 +156,7 @@ export default class Bag extends Class {
    * @returns {Bag}
    */
   each(iteratee, scope) {
-    _.each(this.toPlain(), scope ? iteratee::scope : iteratee);
+    _.each(this.toPlain(), scope ? iteratee.bind(scope) : iteratee);
     return this;
   }
 
@@ -160,7 +167,7 @@ export default class Bag extends Class {
    * @returns {Object}
    */
   map(iteratee, scope) {
-    return _.map(this.toPlain(), scope ? iteratee::scope : iteratee);
+    return _.map(this.toPlain(), scope ? iteratee.bind(scope) : iteratee);
   }
 
   /**
@@ -170,7 +177,7 @@ export default class Bag extends Class {
    * @returns {Bag}
    */
   transform(iteratee, scope) {
-    iteratee = scope ? iteratee::scope : iteratee
+    iteratee = scope ? iteratee.bind(scope) : iteratee;
     let items = this.toPlain();
     for (let key in items) items[key] = iteratee(items[key], key, items);
     return this;
@@ -206,7 +213,7 @@ export default class Bag extends Class {
    * @returns {Bag}
    */
   reset(object = {}) {
-    Items.set(this, object);
+    Bags.set(this, object);
     return this;
   }
 
@@ -216,12 +223,12 @@ export default class Bag extends Class {
    * @override
    */
   toPlain() {
-    return Items.get(this);
+    return Bags.get(this);
   }
 
   /**
    * Destroys Bag.
-   * @returns {Class}
+   * @returns {Bag}
    * @override
    */
   destroy() {
@@ -231,10 +238,12 @@ export default class Bag extends Class {
   }
 
   /**
-   * Returns Bag size.
-   * @returns {number}
+   * Generator method to iterate through items using for..of loop.
    */
-  get size() {
-    return _.size(this.all());
+  * iterator() {
+    let all = this.toPlain();
+    for (let key in all) {
+      yield [key, all[key]];
+    }
   }
 }

@@ -1,30 +1,29 @@
-import Serializer from '../Serializer/Serializer';
 import * as _ from 'lodash';
-
-/**
- * Supported Console API Methods
- * @type {Object}
- * @private
- */
-const ApiMethods = {
-  log: 'log',
-  info: 'info',
-  warn: 'warn',
-  error: 'error',
-  debug: ['debug', 'log'],
-  dir: 'dir',
-  time: 'time',
-  timeEnd: 'timeEnd',
-  trace: 'trace',
-  assert: 'assert'
-};
 
 /**
  * Fiber Log.
  * @class
- * @mixes LogConfig
+ * @extends {Class}
  **/
 export default class Log {
+
+  /**
+   * Supported Console API Methods.
+   * @type {Object}
+   * @static
+   */
+  static ConsoleApi = {
+    log: 'log',
+    info: 'info',
+    warn: 'warn',
+    error: 'error',
+    debug: ['debug', 'log'],
+    dir: 'dir',
+    time: 'time',
+    timeEnd: 'timeEnd',
+    trace: 'trace',
+    assert: 'assert'
+  };
 
   /**
    * String representing who is logging the messages.
@@ -136,7 +135,7 @@ export default class Log {
    * @return {Log}
    */
   write(level, args) {
-    level = _.includes(ApiMethods, level) ? level : 'log';
+    level = _.includes(Log.ConsoleApi, level) ? level : 'log';
     if (! this.isAllowedLevel(level)) return this;
     return this.callWriter(level, args);
   }
@@ -225,7 +224,7 @@ export default class Log {
    * @return {Log}
    */
   callWriter(method, args) {
-    method = _.includes(ApiMethods, method) ? method : 'log';
+    method = _.includes(Log.ConsoleApi, method) ? method : 'log';
     if (! _.isFunction(this._cachedApi[method])) return this;
     let msg = _.first(args), details = this.renderTemplate({msg: _.isString(msg) ? msg : '', level: method});
     this._cachedApi[method].apply(null, [details].concat(_.drop(args)));
@@ -282,13 +281,13 @@ export default class Log {
   }
 
   /**
-   * Caches Console Api.
+   * Caches Console Log.ConsoleApi.
    * @returns {Log._cachedApi|{}}
    * @private
    */
   _cacheConsoleApi() {
-    for (let method in ApiMethods) {
-      let apiMethod = ApiMethods[method];
+    for (let method in Log.ConsoleApi) {
+      let apiMethod = Log.ConsoleApi[method];
       let isArr = _.isArray(apiMethod);
 
       if (isArr && _.has(console, apiMethod[0])) apiMethod = apiMethod[0];

@@ -5,6 +5,7 @@ import Emitter from './Events/Emitter';
 import Class from './Foundation/Class';
 import Bag from './Foundation/Bag';
 import State from './Foundation/State';
+import Model from './Model/Model';
 import Log from './Logger/Log';
 import Monitor from './Monitor/Monitor';
 import Container from './Container/Container';
@@ -21,6 +22,7 @@ let Framework = {
   Class,
   Bag,
   State,
+  Model,
   Log,
   Monitor,
   Container,

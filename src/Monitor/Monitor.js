@@ -3,8 +3,7 @@ import Log from '../Logger/Log';
 import * as _ from 'lodash';
 
 /**
- * Monitor module.
- *
+ * Fiber Monitor. Debug module.
  * @class
  * @extends {Emitter}
  */
@@ -35,7 +34,7 @@ export default class Monitor extends Emitter {
 
   /**
    * Emitter monitor
-   * @type {Fiber.Events}
+   * @type {Emitter}
    * @private
    */
   _monitor = null;
@@ -49,7 +48,7 @@ export default class Monitor extends Emitter {
 
   /**
    * Logger instance
-   * @type {Object.<Fiber.Log>}
+   * @type {Object<Log>}
    * @private
    */
   _logger = null;
@@ -76,7 +75,7 @@ export default class Monitor extends Emitter {
   constructor(options) {
     super(options);
     _.extend(this, options);
-    this._monitor = Events.$new();
+    this._monitor = new Emitter();
     this._logger = new Log({level: 'debug', as: '[Fiber.Monitor]', templates: this._templates});
     this._listeningToGlobals(true);
     _.bindAll(this, ['_fired', '_firedGlobal']);
@@ -113,7 +112,7 @@ export default class Monitor extends Emitter {
    * @returns {Monitor}
    */
   watchEvents(object, watchGlobals = true) {
-    this._monitor.listenTo(object, 'all', this._fired);
+    this._monitor.when(object, 'all', this._fired);
     watchGlobals && this.watchGlobalEvents(object);
     this.fire('watch.events:start', object, this);
     return this;
@@ -126,7 +125,7 @@ export default class Monitor extends Emitter {
    * @returns {Monitor}
    */
   stopWatchingEvents(object, stopGlobals = true) {
-    this._monitor.stopListening(object, 'all', this._fired);
+    this._monitor.off(object, 'all', this._fired);
     stopGlobals && this.stopWatchingGlobalEvents(object);
     this.fire('watch.events:stop', object, this);
     return this;
@@ -229,13 +228,13 @@ export default class Monitor extends Emitter {
    * @private
    */
   _listeningToGlobals(state) {
-    this._monitor[(state ? 'listenTo' : 'stopListening')](Events.getBroadcast(), 'all', this._firedGlobal);
+    this._monitor[(state ? 'when' : 'off')](Emitter.Broadcast, 'all', this._firedGlobal);
   }
 
   /**
    * Notifies that event was triggered.
    * @param {string} event
-   * @param {...any} args
+   * @param {...any} object
    * @private
    */
   _fired(event, object) {
@@ -245,7 +244,7 @@ export default class Monitor extends Emitter {
   /**
    * Notifies that Global event was triggered.
    * @param {string} event
-   * @param {...any} args
+   * @param {...any} object
    * @private
    */
   _firedGlobal(event, object) {

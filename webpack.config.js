@@ -5,7 +5,6 @@ var webpack = require('webpack')
   // Webpack plugins
   , UglifyJsPlugin = webpack.optimize.UglifyJsPlugin
   , CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin
-  , HotModuleReplacementPlugin = webpack.HotModuleReplacementPlugin
 
   // Build vars
   , env = args.argv.mode || 'build'
@@ -24,10 +23,6 @@ if (env === 'build') {
   plugins.push(new UglifyJsPlugin({minimize: true}));
 }
 
-// if (env === 'test' || env === 'dev') {
-//   plugins.push(new HotModuleReplacementPlugin({multiStep: true}));
-// }
-
 // Will chunk Framework and vendor into two separate files.
 if (chunkVendor) {
   plugins.push(new CommonsChunkPlugin('vendor', libraryName.toLowerCase() + '.bundle.js'));
@@ -42,8 +37,8 @@ var config = {
 //   devtool: 'source-map',
   // Bundles entry file
   entry: {
+    vendor: ['lodash', 'immutable', 'superagent', 'ractive', 'babel-polyfill'],
     app: __dirname + '/src/Framework.js',
-    vendor: ['lodash', 'superagent', 'ractive', 'babel-polyfill']
   },
   // Output configuration
   output: {

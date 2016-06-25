@@ -1,7 +1,14 @@
 import AbstractParser from './AbstractParser';
 import SerializeAdapter from './SerializeAdapter';
-import JsonAdapter from './JsonAdapter';
+import JsonParser from './Json/JsonParser';
+import JsonAdapter from './Json/JsonAdapter';
 import Log from '../Logger/Log';
+
+/**
+ * Default Serialize Adapter.
+ * @type {JsonAdapter}
+ */
+let DefaultAdapter = new JsonAdapter();
 
 /**
  * Serializer.
@@ -10,18 +17,13 @@ import Log from '../Logger/Log';
 export default class Serializer {
 
   /**
-   * Serialize Adapter instance.
-   * @type {SerializeAdapter}
-   */
-  adapter = new JsonAdapter();
-
-  /**
    * Parsers.
    * @type {Object}
    * @static
    */
   static Parsers = {
-    Abstract: AbstractParser
+    Abstract: AbstractParser,
+    Json: JsonParser
   };
 
   /**
@@ -35,10 +37,16 @@ export default class Serializer {
   };
 
   /**
+   * Serialize Adapter instance.
+   * @type {SerializeAdapter}
+   */
+  adapter = DefaultAdapter;
+
+  /**
    * Constructs Serializer.
    * @param {SerializeAdapter} [adapter=JsonAdapter]
    */
-  constructor(adapter = new JsonAdapter()) {
+  constructor(adapter = DefaultAdapter) {
     if (adapter instanceof SerializeAdapter) {
       this.adapter = adapter;
     }
@@ -77,13 +85,13 @@ export default class Serializer {
 
   /**
    * Returns object parsed from `string`.
-   * @param {string} string
+   * @param {string} json
    * @param {Object} [defaults = {}]
    * @returns {Object}
    * @static
    */
-  static unserialize(object, defaults = {}) {
-    return Internal.unserialize(object, defaults);
+  static unserialize(json, defaults = {}) {
+    return Internal.unserialize(json, defaults);
   }
 }
 

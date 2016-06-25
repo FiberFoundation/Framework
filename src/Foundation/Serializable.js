@@ -24,6 +24,26 @@ export default class Serializable {
   }
 
   /**
+   * Marks property as `hidden` to avoid it to be serialized.
+   * @param {string|Array.<string>} hidden
+   * @returns {Serializable}
+   */
+  markAsHidden(hidden) {
+    this.hidden = _.uniq(this.hidden.concat(_.castArray(hidden)));
+    return this;
+  }
+
+  /**
+   * Marks property as `visible` to allow to serialize it.
+   * @param {string|Array.<string>} visible
+   * @returns {Serializable}
+   */
+  markAsVisible(visible) {
+    this.hidden = _.difference(this.hidden, _.castArray(visible));
+    return this;
+  }
+
+  /**
    * Serializes Serializable to JSON string.
    * @returns {string}
    */
@@ -59,30 +79,18 @@ export default class Serializable {
   }
 
   /**
+   * Returns serialized object if Serializable used in string context.
+   * @returns {string}
+   */
+  toString() {
+    return this.serialize();
+  }
+
+  /**
    * Returns object that will be serialized and used in `toPlain` and `fromPlain` methods.
    * @returns {Object}
    */
   getSerializable() {
-    return this;
-  }
-
-  /**
-   * Marks property as `hidden` to avoid it to be serialized.
-   * @param {string|Array.<string>} hidden
-   * @returns {Serializable}
-   */
-  markAsHidden(hidden) {
-    this.hidden = _.uniq(this.hidden.concat(_.castArray(hidden)));
-    return this;
-  }
-
-  /**
-   * Marks property as `visible` to allow to serialize it.
-   * @param {string|Array.<string>} visible
-   * @returns {Serializable}
-   */
-  markAsVisible(visible) {
-    this.hidden = _.difference(this.hidden, _.castArray(visible));
     return this;
   }
 }

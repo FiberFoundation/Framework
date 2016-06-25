@@ -8,7 +8,7 @@ export default class SerializeAdapter {
 
   /**
    * Parser instance.
-   * @type {Object}
+   * @type {AbstractParser}
    */
   parser = null;
 
@@ -18,7 +18,7 @@ export default class SerializeAdapter {
    */
   constructor(options = {}) {
     this.options = options;
-    if (options.parser instanceof AbstractParser) {
+    if (AbstractParser.isParser(options.parser)) {
       this.parser = options.parser;
     }
   }
@@ -30,7 +30,6 @@ export default class SerializeAdapter {
    */
   serialize(object) {
     throw new Error('[SerializeAdapter]: `serialize` methods should be overridden in Child Class.');
-    return '';
   }
 
   /**
@@ -40,6 +39,5 @@ export default class SerializeAdapter {
    */
   unserialize(string) {
     throw new Error('[SerializeAdapter]: `unserialize` methods should be overridden in Child Class.');
-    return {};
   }
 }

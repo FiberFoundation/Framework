@@ -1,4 +1,5 @@
-import SerializeAdapter from './SerializeAdapter';
+import SerializeAdapter from '../SerializeAdapter';
+import JsonParser from './JsonParser';
 import * as _ from 'lodash';
 
 /**
@@ -10,9 +11,9 @@ export default class JsonAdapter extends SerializeAdapter {
 
   /**
    * JSON Parser instance.
-   * @type {Object}
+   * @type {JsonParser}
    */
-  parser = JSON;
+  parser = JsonParser;
 
   /**
    * Constructs JSON Serialize Adapter.

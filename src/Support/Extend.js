@@ -3,7 +3,6 @@ import * as _ from 'lodash';
 /**
  * Transforms plain object to Constructable Class or if nothing is passed creates empty Class wrapper.
  * @param {Object|any} [proto={}]
- * @param {boolean} [resolve=true]
  * @return {Constructable}
  */
 export function toClass(proto = {}) {
@@ -55,8 +54,8 @@ export function Extend(Parent = function() {}, proto = {}) {
 
 /**
  * Returns Constructor from `proto` or creates one.
- * @param {Constructable} Parent
  * @param {Object} proto
+ * @param {Constructable} Parent
  * @param {Array} args
  * @returns {Constructor}
  */

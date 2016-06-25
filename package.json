@@ -12,7 +12,7 @@
     "stop": "npm run clean",
     "build:test": "webpack --progress --colors --mode=test",
     "test": "npm run test:trigger -- -w",
-    "test:trigger": "./node_modules/.bin/mocha --recursive --compilers js:babel-core/register ./tests/src",
+    "test:trigger": "./node_modules/.bin/mocha --recursive --compilers js:babel-core/register ./tests/src --require babel-polyfill",
     "clean": "rm -rf ./dist",
     "min": "uglifyjs ./dist/fiber.js --mangle --source-map ./dist/fiber.min.map -o ./dist/fiber.min.js",
     "doc": "rm -rf ./docs/doc && mr-doc -s ./src -o ./docs/doc -n 'Fiber' -t 'cayman'",
@@ -52,11 +52,11 @@
     "immutable": "^3.8.1",
     "lodash": "^4.12.0",
     "ractive": "^0.7.3",
-    "superagent": "^1.8.3",
-    "transit-js": "^0.8.846"
+    "superagent": "^1.8.3"
   },
   "devDependencies": {
     "babel": "^6.5.2",
+    "babel-core": "^6.10.4",
     "babel-loader": "^6.2.4",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-plugin-transform-async-to-generator": "^6.8.0",
@@ -73,7 +73,6 @@
     "esdoc": "^0.4.7",
     "esdoc-es7-plugin": "0.0.3",
     "esdoc-importpath-plugin": "0.0.1",
-    "gulp": "^3.9.1",
     "install": "^0.8.1",
     "isparta": "^4.0.0",
     "istanbul": "^0.4.3",
@@ -83,7 +82,6 @@
     "mr-doc": "^3.2.1",
     "mr-doc-theme-cayman": "^1.4.1",
     "npm": "^3.9.5",
-    "shelljs": "^0.7.0",
     "sinon": "^1.17.4",
     "uglify-js": "^2.6.2",
     "webpack": "^1.13.1",

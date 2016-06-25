@@ -1,5 +1,5 @@
 import Serializable from '../Foundation/Serializable';
-import Vent from './Support';
+import Vent from './_Support';
 import * as _ from 'lodash';
 
 /**
@@ -13,6 +13,7 @@ let Channels = new WeakMap();
 /**
  * Fiber Emitter.
  * @class
+ * @extends {Serializable}
  */
 export default class Emitter extends Serializable {
 
@@ -27,6 +28,12 @@ export default class Emitter extends Serializable {
    * @type {Object}
    */
   catalog = {};
+  
+  /**
+   * Flag to enable/disable events to trigger.
+   * @type {boolean}
+   */
+  allowedToEmit = true;
 
   /**
    * Constructs Events.
@@ -35,6 +42,7 @@ export default class Emitter extends Serializable {
   constructor(options = {ns: '', catalog: {}}) {
     super(options);
     this.resetNsAndCatalog(options);
+    if (options.allowedToEmit) this.allowedToEmit = options.allowedToEmit;
   }
 
   /**
@@ -61,6 +69,7 @@ export default class Emitter extends Serializable {
    * @returns {Emitter}
    */
   trigger(event, ...args) {
+    if (! this.allowedToEmit) return this;
     return Vent.trigger.apply(this, arguments);
   }
 
@@ -151,6 +160,17 @@ export default class Emitter extends Serializable {
   }
 
   /**
+   * Broadcasts global event.
+   * @param {string} event
+   * @param {...any} args
+   * @returns {Emitter}
+   */
+  broadcast(event, ...args) {
+    Broadcast.fire.apply(Broadcast, arguments);
+    return this;
+  }
+
+  /**
    * Inversion-of-control versions of `on` that listens to the Global Broadcast.
    * That gives ability to listen to events even if you don't know what object will fire it.
    * @param {string} event
@@ -191,17 +211,6 @@ export default class Emitter extends Serializable {
   }
 
   /**
-   * Broadcasts global event.
-   * @param {string} event
-   * @param {...any} args
-   * @returns {Emitter}
-   */
-  broadcast(event, ...args) {
-    Broadcast.fire.apply(Broadcast, arguments);
-    return this;
-  }
-
-  /**
    * Creates separate Emitter channel with the given `name`, if one exists then it will be returned.
    * @param {string} name
    * @returns {Emitter}
@@ -234,6 +243,17 @@ export default class Emitter extends Serializable {
   }
 
   /**
+   * Resets events namespace and catalog to default values.
+   * @param {Object} [options]
+   * @returns {Emitter}
+   */
+  resetNsAndCatalog(options = {ns: '', catalog: {}}) {
+    this.ns = options.ns || '';
+    this.catalog = options.catalog || {};
+    return this;
+  }
+
+  /**
    * Unbounds and clears all events.
    * @returns {Emitter}
    */
@@ -252,22 +272,10 @@ export default class Emitter extends Serializable {
 
   /**
    * Unbounds and clears all Global events.
-   * @param {boolean} [cleanUp]
    * @returns {Emitter}
    */
-  destroyBroadcastEvents(cleanUp) {
-    Broadcast.destroy(cleanUp);
-    return this;
-  }
-
-  /**
-   * Resets events namespace and catalog to default values.
-   * @param {{ns:string,catalog:Object}} [options={}]
-   * @returns {Emitter}
-   */
-  resetNsAndCatalog({ns, catalog} = {}) {
-    this.ns = ns || '';
-    this.catalog = catalog || {};
+  destroyBroadcastEvents() {
+    Broadcast.destroy();
     return this;
   }
 };
