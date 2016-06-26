@@ -1,4 +1,4 @@
-import Serializable from './Serializable';
+import Serializable from '../Serializer/Serializable';
 import Path from '../Support/Path';
 import {Map, List} from 'immutable';
 import * as _ from 'lodash';
@@ -33,7 +33,7 @@ export default class Synthetic extends Serializable {
    * @returns {boolean}
    */
   guard() {
-    if (this.hasOwnProperty(attributes)) {
+    if (this.hasOwnProperty('attributes')) {
       Guarded.set(this, this.attributes);
       delete this.attributes;
     }

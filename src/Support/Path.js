@@ -2,8 +2,8 @@
  * Path Support for the Immutable.
  * @type {Object}
  */
-export default Path = {
-  
+export default {
+
   /**
    * Converts `key` to path
    * @param {Array|string} key
@@ -21,7 +21,7 @@ export default Path = {
   is(key) {
     return _.isArray(key) || key.split('.').length > 1;
   },
-  
+
   /**
    * Determines if given `key` is not a path.
    * @param {Array|string} key

@@ -1,4 +1,4 @@
-import Serializable from '../Foundation/Serializable';
+import Serializable from '../Serializer/Serializable';
 import {copyProperties} from '../Support/Extend';
 import Vent from './_Support';
 import * as _ from 'lodash';

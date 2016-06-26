@@ -1,4 +1,4 @@
-import Serializer from '../Serializer/Serializer';
+import Serializer from './Serializer';
 import * as _ from 'lodash';
 
 /**
