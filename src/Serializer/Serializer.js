@@ -107,7 +107,7 @@ const Internal = new Serializer();
  * @param {string} method
  * @param {string|Object} what
  * @param {string|Object} [defaults]
- * @returns {*}
+ * @returns {any}
  */
 function convert(adapter, method, what, defaults) {
   try {

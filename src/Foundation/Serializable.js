@@ -65,7 +65,15 @@ export default class Serializable {
    * @returns {Object}
    */
   toPlain() {
-    return _.omit(this.getSerializable(), this.hidden);
+    return _.omit(this.serializable(), this.hidden);
+  }
+
+  /**
+   * Returns all items. Alias for `toPlain()`.
+   * @returns {Object}
+   */
+  all() {
+    return this.toPlain();
   }
 
   /**
@@ -74,7 +82,7 @@ export default class Serializable {
    * @returns {Serializable}
    */
   fromPlain(plain) {
-    _.assign(this.getSerializable(), plain);
+    _.extend(this.serializable(), plain);
     return this;
   }
 
@@ -87,10 +95,10 @@ export default class Serializable {
   }
 
   /**
-   * Returns object that will be serialized and used in `toPlain` and `fromPlain` methods.
+   * Returns object that will be serialized and used in `toPlain()` and `fromPlain()` methods.
    * @returns {Object}
    */
-  getSerializable() {
+  serializable() {
     return this;
   }
 }

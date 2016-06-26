@@ -10,7 +10,7 @@ export default class JsonParser extends AbstractParser {
   /**
    * Converts a JavaScript value to a JSON string, optionally replacing values if a replacer function is specified,
    * or optionally including only the specified properties if a replacer array is specified.
-   * @param {*} value
+   * @param {any} value
    * @param {Function|string|Number} [replacer]
    * @param {Number|string} [space]
    * @returns {string}

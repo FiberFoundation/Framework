@@ -116,7 +116,8 @@ export default class Class extends Emitter {
    * @returns {Class}
    */
   merge(object) {
-    return _.merge(this, object);
+    _.merge(this, object);
+    return this;
   }
 
   /**
@@ -125,7 +126,8 @@ export default class Class extends Emitter {
    * @returns {Class}
    */
   mix(mixin) {
-    return _.assign(this, mixin);
+    _.extend(this, mixin);
+    return this;
   }
 
   /**

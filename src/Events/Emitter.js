@@ -1,4 +1,5 @@
 import Serializable from '../Foundation/Serializable';
+import {copyProperties} from '../Support/Extend';
 import Vent from './_Support';
 import * as _ from 'lodash';
 
@@ -279,23 +280,42 @@ export default class Emitter extends Serializable {
     Broadcast.destroy();
     return this;
   }
+
+  /**
+   * Creates new Emitter.
+   * @param {Object} [options]
+   * @returns {Emitter}
+   * @static
+   */
+  static make(options) {
+    return new Emitter(options);
+  }
+
+  /**
+   * Returns Emitter as plain object.
+   * @returns {Object}
+   */
+  static asObject() {
+    return copyProperties({}, new Emitter);
+  }
+
+  /**
+   * Determines if given `object` is Emitter.
+   * @param {any} object
+   * @returns {boolean}
+   * @static
+   */
+  static isEmitter(object) {
+    if (_.isFunction(object)) object = Reflect.getPrototypeOf(object);
+    return object instanceof Emitter;
+  }
 };
 
 /**
- * Broadcast.
+ * Global Broadcast.
  * @type {Emitter}
  */
 const Broadcast = new Emitter();
 
 /** Cache reference for the Global Broadcast. */
 Emitter.Broadcast = Broadcast;
-
-/**
- * Event Pipeline.
- * @type {Emitter}
- */
-const Pipeline = new Emitter();
-
-/** Cache reference for the Pipeline. */
-Emitter.Pipeline = Pipeline;
-

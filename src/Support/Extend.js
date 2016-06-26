@@ -9,7 +9,7 @@ export function toClass(proto = {}) {
   if (_.isFunction(proto)) return proto;
   let Constructable = createDefaultConstructor(proto.constructor);
   return assignPrototype(Constructable, proto);
-};
+}
 
 /**
  * Mixes objects with override and transforms to Constructable.
@@ -28,7 +28,7 @@ export function Mix(...args) {
  */
 export function All(...Constructable) {
   return toClass(copyProperties({}, Constructable));
-};
+}
 
 /**
  * Extend this Constructable to create a new one inheriting this one.
@@ -50,7 +50,7 @@ export function Extend(Parent = function() {}, proto = {}) {
   if (proto) copyProperties(Child.prototype, proto);
   // and finally return Child
   return Child;
-};
+}
 
 /**
  * Returns Constructor from `proto` or creates one.
@@ -76,7 +76,7 @@ export function createDefaultConstructor(Parent, args = []) {
   return function FiberConstructor() {
     if (Parent) Parent.bind(this).apply(null, args.concat(...arguments));
   };
-};
+}
 
 /**
  * Creates prototype for the given `Constructable` using `proto` object and `Constructable` itself as Constructable,
@@ -90,7 +90,7 @@ export function assignPrototype(Constructable, proto = {}) {
     constructor: {value: Constructable, enumerable: false, configurable: true, writable: true}
   });
   return Constructable;
-};
+}
 
 /**
  * Add static properties to the constructor function.
