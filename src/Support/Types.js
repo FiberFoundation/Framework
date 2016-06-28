@@ -49,7 +49,7 @@ export class Type {
    * @param {Symbol} method
    */
   set constructionMethod(method) {
-    if (Object.values(Type.ConstructionMethod).contains[method]) {
+    if (Object.values(Type.ConstructionMethod).includes(method)) {
       this[ConstructionMethod] = method;
     }
   }
@@ -61,8 +61,8 @@ export class Type {
    * @param {Symbol} [constructionMethod]
    * @param {Function} [customConstruction]
    */
-  constructor(TypeClass, defaults = TypeClass, constructionMethod = Type.ConstructionMethod.NEW, customConstruction) {
-    if (Symbol.isSymbol(defaults)) {
+  constructor(TypeClass, defaults, constructionMethod = Type.ConstructionMethod.NEW, customConstruction) {
+    if (typeof defaults === 'symbol') {
       [constructionMethod, customConstruction, defaults] = [defaults, constructionMethod, NotSet];
     }
 
@@ -139,7 +139,7 @@ export class Type {
  * Fiber build-in Types.
  * @type {ImmutableRecordClass|Object}
  */
-export default new Immutable.Record({
+export default new (Immutable.Record({
   /** Value properties. */
   Infinity: new Type(Infinity, Type.ConstructionMethod.NONE),
   NaN: new Type(NaN, Type.ConstructionMethod.NONE),
@@ -173,7 +173,7 @@ export default new Immutable.Record({
   Blob: new Type(Blob, new Blob([])),
   FormData: new Type(FormData, new FormData),
   /** WebSocket object. */
-  WebSocket: new Type(WebSocket, new WebSocket('')),
+  WebSocket: new Type(WebSocket, NotSet),
   /** Worker API objects. */
   Worker: new Type(Worker, new Worker('')),
   /** Immutable Types. */
@@ -192,4 +192,4 @@ export default new Immutable.Record({
   },
   /** Fiber Type. */
   Type: new Type(Type, new Type(NotSet))
-});
+}));

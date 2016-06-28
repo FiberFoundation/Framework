@@ -646,7 +646,7 @@ export default class Synthetic extends Emitter {
    */
   static isInstance(object) {
     if (typeof object === 'function') object = Reflect.getPrototypeOf(object);
-    return object instanceof this.constructor[Symbol.species];
+    return object instanceof this[Symbol.species];
   }
 
   /**
