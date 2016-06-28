@@ -3,7 +3,6 @@ import * as _ from 'lodash';
 /**
  * Fiber Log.
  * @class
- * @extends {Class}
  **/
 export default class Log {
 
@@ -314,7 +313,7 @@ export default class Log {
 }
 
 /**
- * Logger used internally for static conversion.
+ * Log used internally for static conversion.
  * @type {Log}
  */
 const Internal = new Log();

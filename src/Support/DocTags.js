@@ -9,6 +9,16 @@
  */
 
 /**
+ * Build-in Type Definition.
+ * @typedef {AnyClass} TypeClass
+ */
+
+/**
+ * Class Type.
+ * @typedef {Object|Function} AnyClass
+ */
+
+/**
  * Constructor Type.
  * @typedef {Function} Constructor
  */
@@ -26,6 +36,16 @@
 /**
  * Immutable Iterable Type.
  * @typedef {Iterable<any>|Iterable<any, any>|Immutable.Iterable} ImmutableIterable
+ */
+
+/**
+ * Immutable Record Type.
+ * @typedef {Record<string, any>|Immutable.Iterable} ImmutableRecord
+ */
+
+/**
+ * Immutable Record Class Type.
+ * @typedef {Record.Class<string, any>|Immutable.Iterable} ImmutableRecordClass
  */
 
 /**

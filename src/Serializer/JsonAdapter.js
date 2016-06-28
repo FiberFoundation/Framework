@@ -1,5 +1,4 @@
-import SerializeAdapter from '../SerializeAdapter';
-import JsonParser from './JsonParser';
+import SerializeAdapter from '../Contracts/SerializeAdapter';
 import * as _ from 'lodash';
 
 /**
@@ -10,18 +9,12 @@ import * as _ from 'lodash';
 export default class JsonAdapter extends SerializeAdapter {
 
   /**
-   * JSON Parser instance.
-   * @type {JsonParser}
-   */
-  parser = JsonParser;
-
-  /**
    * Constructs JSON Serialize Adapter.
    * @param {Object} [options={}]
    */
   constructor(options = {}) {
-    super(options);
-    _.extend(this, {replacer: void 0, space: void 0, reviver: void 0}, options);
+    super();
+    this.options = _.defaults(options, {replacer: void 0, space: void 0, reviver: void 0});
   }
 
   /**
@@ -31,7 +24,7 @@ export default class JsonAdapter extends SerializeAdapter {
    * @override
    */
   serialize(object) {
-    return this.parser.stringify(object, this.options.replacer, this.options.space);
+    return JSON.stringify(object, this.options.replacer, this.options.space);
   }
 
   /**
@@ -41,6 +34,6 @@ export default class JsonAdapter extends SerializeAdapter {
    * @override
    */
   unserialize(string) {
-    return this.parser.parse(string, this.options.reviver);
+    return JSON.parse(string, this.options.reviver);
   }
 }

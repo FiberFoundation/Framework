@@ -1,14 +1,14 @@
-import * as _ from 'lodash';
-
 /**
  * Transforms plain object to Constructable Class or if nothing is passed creates empty Class wrapper.
  * @param {Object|any} [proto={}]
  * @return {Constructable}
  */
 export function toClass(proto = {}) {
-  if (_.isFunction(proto)) return proto;
+  if (typeof proto === 'function') return proto;
   let Constructable = createDefaultConstructor(proto.constructor);
-  return assignPrototype(Constructable, proto);
+  assignPrototype(Constructable, proto);
+  Object.assign(Constructable.prototype, proto);
+  return Constructable;
 }
 
 /**
@@ -17,7 +17,7 @@ export function toClass(proto = {}) {
  * @returns {Constructable}
  */
 export function Mix(...args) {
-  return toClass(_.extend.apply(_, [{}].concat(args)));
+  return toClass(Object.assign.apply(void 0, [{}].concat(args)));
 }
 
 /**
@@ -27,7 +27,7 @@ export function Mix(...args) {
  * @returns {Constructable}
  */
 export function All(...Constructable) {
-  return toClass(copyProperties({}, Constructable));
+  return toClass(copyProperties({}, ...Constructable));
 }
 
 /**
@@ -106,13 +106,12 @@ export function assignStatics(Constructable, statics, Parent) {
 /**
  * Copies properties from Source to Target Constructable.
  * @param {Constructable} Target
- * @param {Constructable|Array.<Constructable>} Source
+ * @param {...Constructable|...Array.<Constructable>} Source
  * @return {Constructable}
  */
-export function copyProperties(Target, Source) {
-  Source = _.castArray(Source);
-  for (let i = 0; i < Source; i ++) {
-    for (let key of Reflect.ownKeys(Source[i])) {
+export function copyProperties(Target, ...Source) {
+  for (let i = 0; i < Source.length; i ++) {
+    for (let key of Reflect.ownKeys(Source[i].prototype || Source[i])) {
       if (key === "constructor" || key === "prototype" || key === "name") continue;
       let desc = Object.getOwnPropertyDescriptor(Source[i], key);
       Object.defineProperty(Target, key, desc);

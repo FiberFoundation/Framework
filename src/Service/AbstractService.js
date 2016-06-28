@@ -4,25 +4,18 @@
  * @interface
  **/
 export default class AbstractService {
-
+  
   /**
-   * Register the service provider.
+   * Start and bootstraps the Service.
    * @returns {AbstractService}
    * @abstract
    */
-  register() {}
+  start() {}
 
   /**
-   * Loads Service.
+   * Stops and destroys the Service.
    * @returns {AbstractService}
    * @abstract
    */
-  boot() {}
-
-  /**
-   * Stops and destroys Service.
-   * @returns {AbstractService}
-   * @abstract
-   */
-  destroy() {}
+  stop() {}
 }

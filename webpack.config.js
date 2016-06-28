@@ -1,44 +1,44 @@
-var webpack = require('webpack')
-  , path = require('path')
-  , args = require('yargs')
+let webpack = require('webpack');
+let path = require('path');
+let args = require('yargs');
+let packageJson = require('./package.json');
 
   // Webpack plugins
-  , UglifyJsPlugin = webpack.optimize.UglifyJsPlugin
-  , CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin
+let UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
+let CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 
   // Build vars
-  , env = args.argv.mode || 'build'
-  , chunkVendor = true
-  , libraryName = 'Fiber'
-  , isProd = env === 'build'
-  , extension = isProd ? '.min.js' : '.js'
-  , outputPath = __dirname + (env === 'test' ? '/tests/manual/dist' : '/dist')
-  , plugins = [];
+let env = args.argv.mode || 'build';
+let libraryName = 'Fiber';
+let isProd = env === 'prod-build';
+let extension = isProd ? '.min.js' : '.js';
+let outputPath = __dirname + '/dist';
+
+// Will chunk Framework and vendor into two separate files.
+let plugins = [
+  new CommonsChunkPlugin('vendor', 'fiber.vendor.js', Infinity)
+];
 
 // Log current build environment.
 console.log('Current build Environment: ' + env + '\n');
 
 // Add `Production` plugins
-if (env === 'build') {
+if (isProd) {
   plugins.push(new UglifyJsPlugin({minimize: true}));
-}
-
-// Will chunk Framework and vendor into two separate files.
-if (chunkVendor) {
-  plugins.push(new CommonsChunkPlugin('vendor', libraryName.toLowerCase() + '.bundle.js'));
 }
 
 /**
  * Webpack Configuration
  * @type {Object}
  */
-var config = {
+module.exports = {
   // Source map to use
 //   devtool: 'source-map',
   // Bundles entry file
+  cache: false,
   entry: {
-    vendor: ['lodash', 'immutable', 'superagent', 'ractive', 'babel-polyfill'],
-    app: __dirname + '/src/Framework.js',
+    fiber: path.join(__dirname, '/src/Framework.js'),
+    vendor: Object.keys(packageJson.dependencies)
   },
   // Output configuration
   output: {
@@ -46,7 +46,8 @@ var config = {
     libraryTarget: 'umd',
     path: outputPath,
     publicPath: "/bundle/",
-    filename: libraryName.toLowerCase() + extension,
+    filename: '[name]' + extension,
+//    filename: libraryNameLower + extension,
     umdNamedDefine: true
   },
   // Resolve options
@@ -54,25 +55,23 @@ var config = {
     root: path.resolve('./src'),
     extensions: ['', '.js']
   },
+  // Plugins
+  plugins: plugins,
   // Modules
   module: {
     loaders: [
       // Code linting
 //       {
-//         test: /(\.jsx|\.js)$/,
+//         test: /(\.js)$/,
 //         loader: 'jscs-loader',
 //         exclude: /node_modules/
 //       },
       // ES6 support
       {
-        test: /(\.jsx|\.js)$/,
+        test: /(\.js)$/,
         loader: 'babel',
         exclude: /(node_modules)/
       }
     ]
-  },
-  // Plugins
-  plugins: plugins
+  }
 };
-
-module.exports = config;

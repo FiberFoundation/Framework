@@ -1,3 +1,5 @@
+import * as _ from 'lodash'
+
 /**
  * Path Support for the Immutable.
  * @type {Object}
@@ -19,7 +21,7 @@ export default {
    * @returns {boolean}
    */
   is(key) {
-    return _.isArray(key) || key.split('.').length > 1;
+    return Array.isArray(key) || key.split('.').length > 1;
   },
 
   /**

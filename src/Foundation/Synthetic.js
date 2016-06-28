@@ -1,4 +1,4 @@
-import Serializable from '../Serializer/Serializable';
+import Emitter from '../Events/Emitter';
 import Path from '../Support/Path';
 import {Map, List} from 'immutable';
 import * as _ from 'lodash';
@@ -14,7 +14,7 @@ let Guarded = new WeakMap();
  * @class
  * @extends {Serializable}
  **/
-export default class Synthetic extends Serializable {
+export default class Synthetic extends Emitter {
 
   /**
    * Constructs Synthetic Collection.
@@ -71,7 +71,8 @@ export default class Synthetic extends Serializable {
    * @return {Synthetic}
    */
   reset(attributes = {}) {
-    this.attributes = Map.isMap(attributes) ? attributes : new Map(attributes);
+    this.attributes = Map.isMap(attributes) ? attributes : Map(attributes);
+    this.onChange(this.attributes);
     return this;
   }
 
@@ -95,8 +96,8 @@ export default class Synthetic extends Serializable {
    */
   set(key, value) {
     if (arguments.length === 1) return this.reset(this.attributes.mergeDeep(key));
-    if (Path.is(key)) return this.reset(attributes.setIn(Path.to(key), value));
-    return this.reset(attributes.set(key, value));
+    if (Path.is(key)) return this.reset(this.attributes.setIn(Path.to(key), value));
+    return this.reset(this.attributes.set(key, value));
   }
 
   /**
@@ -140,7 +141,7 @@ export default class Synthetic extends Serializable {
    * @returns {ImmutableList}
    */
   keys() {
-    return List.of(this.attributes.keys());
+    return List(this.attributes.keys());
   }
 
   /**
@@ -148,7 +149,7 @@ export default class Synthetic extends Serializable {
    * @returns {ImmutableList}
    */
   values() {
-    return List.of(this.attributes.values());
+    return List(this.attributes.values());
   }
 
   /**
@@ -156,7 +157,7 @@ export default class Synthetic extends Serializable {
    * @returns {ImmutableList}
    */
   entries() {
-    return List.of(this.attributes.entries());
+    return List(this.attributes.entries());
   }
 
   /**
@@ -184,7 +185,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   clone() {
-    return new Synthetic(this.toPlain(), this.options);
+    return this.replicate(this.toPlain(), this.options);
   }
 
   /**
@@ -216,7 +217,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   map(mapper, scope) {
-    return new Synthetic(this.attributes.map(mapper, scope));
+    return this.replicate(this.attributes.map(mapper, scope));
   }
 
   /**
@@ -226,7 +227,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   filter(predicate, scope) {
-    return new Synthetic(this.attributes.filter(predicate, scope));
+    return this.replicate(this.attributes.filter(predicate, scope));
   }
 
   /**
@@ -236,7 +237,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   filterNot(predicate, scope) {
-    return new Synthetic(this.attributes.filterNot(predicate, scope));
+    return this.replicate(this.attributes.filterNot(predicate, scope));
   }
 
   /**
@@ -244,7 +245,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   reverse() {
-    return new Synthetic(this.attributes.reverse());
+    return this.replicate(this.attributes.reverse());
   }
 
   /**
@@ -253,7 +254,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   sort(comparator) {
-    return new Synthetic(this.attributes.sort(comparator));
+    return this.replicate(this.attributes.sort(comparator));
   }
 
   /**
@@ -263,7 +264,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   sortBy(mapper, comparator) {
-    return new Synthetic(this.attributes.sortBy(mapper, comparator));
+    return this.replicate(this.attributes.sortBy(mapper, comparator));
   }
 
   /**
@@ -273,7 +274,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   groupBy(grouper, scope) {
-    return new Synthetic(this.attributes.groupBy(grouper, scope));
+    return this.replicate(this.attributes.groupBy(grouper, scope));
   }
 
   /**
@@ -294,7 +295,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   rest() {
-    return new Synthetic(this.attributes.rest());
+    return this.replicate(this.attributes.rest());
   }
 
   /**
@@ -302,7 +303,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   butLast() {
-    return new Synthetic(this.attributes.butLast());
+    return this.replicate(this.attributes.butLast());
   }
 
   /**
@@ -311,7 +312,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   skip(amount) {
-    return new Synthetic(this.attributes.skip(amount));
+    return this.replicate(this.attributes.skip(amount));
   }
 
   /**
@@ -320,7 +321,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   take(amount) {
-    return new Synthetic(this.attributes.take(amount));
+    return this.replicate(this.attributes.take(amount));
   }
 
   /**
@@ -334,7 +335,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   flatten(depth) {
-    return new Synthetic(this.attributes.flatten(depth));
+    return this.replicate(this.attributes.flatten(depth));
   }
 
   /**
@@ -426,7 +427,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   mapKeys(mapper, scope) {
-    return new Synthetic(this.attributes.mapKeys(mapper, scope));
+    return this.replicate(this.attributes.mapKeys(mapper, scope));
   }
 
   /**
@@ -436,7 +437,7 @@ export default class Synthetic extends Serializable {
    * @returns {Synthetic}
    */
   mapEntries(mapper, scope) {
-    return new Synthetic(this.attributes.mapEntries(mapper, scope));
+    return this.replicate(this.attributes.mapEntries(mapper, scope));
   }
 
   /**
@@ -454,6 +455,15 @@ export default class Synthetic extends Serializable {
    */
   all() {
     return this.toPlain();
+  }
+
+  /**
+   * Alias for `toJS()`.
+   * @returns {Object|Array}
+   * @alias toJS
+   */
+  toJSON() {
+    return this.toJS();
   }
 
   /**
@@ -545,7 +555,7 @@ export default class Synthetic extends Serializable {
    * @override
    */
   serializable() {
-    return this.attributes.toJS();
+    return this.toJSON();
   }
 
   /**
@@ -561,11 +571,30 @@ export default class Synthetic extends Serializable {
   }
 
   /**
-   * `Sugar` to call generator in for for...of loops.
-   * @return {Iterator}
+   * On attributes change hook.
+   * @param {Immutable} newAttributes
    */
-  valueOf() {
-    return this.iterator();
+  onChange(newAttributes) {}
+
+  /**
+   * Creates new instance using `Symbol.species` constructor.
+   * @param {...any} args
+   * @returns {Object}
+   */
+  replicate(...args) {
+    const Species = this.getConstructor(Symbol.species);
+    return new Species(...args);
+  }
+
+  /**
+   * Returns Object constructor or retrieves value for the given property.
+   * @param {string|Symbol} [property]
+   * @returns {Constructor|any}
+   */
+  getConstructor(property) {
+    const ConstructorFn = Reflect.getOwnPropertyDescriptor(this, 'constructor').value;
+    if (! property) return ConstructorFn;
+    return ConstructorFn[property];
   }
 
   /**
@@ -573,29 +602,51 @@ export default class Synthetic extends Serializable {
    * @yields {[key, value]}
    */
   * iterator() {
-    yield * this.attributes.entries();
+    const all = this.all();
+    const keys = Reflect.ownKeys(all);
+    for (const key of keys) yield [key, all[key]];
   }
 
   /**
-   * Creates new Synthetic Collection from alternating `object` and `options`.
-   * @param {Object|Immutable} [object]
-   * @param {Object} [options]
-   * @returns {Synthetic}
-   * @static
+   * Specifies a function valued property that is called to convert an object to a corresponding primitive value.
+   * @param {string} hint
+   * @returns {string|number|boolean}
+   * @meta
    */
-  static make(object, options) {
-    return new Synthetic(object, options);
+  [Symbol.toPrimitive](hint) {
+    if (hint === 'string') return this.serialize();
+    else if (hint === 'number') return this.size;
+    return !! this.size;
   }
 
   /**
-   * Determines if given `object` is Synthetic Collection.
+   * A string value used for the default description of an object. Used by `Object.prototype.toString()`.
+   * @returns {string}
+   * @meta
+   */
+  [Symbol.toStringTag]() {
+    return this.getConstructor('name');
+  }
+
+  /**
+   * Returns constructor function that is used to create derived objects.
+   * @returns {Constructable}
+   * @static
+   * @meta
+   */
+  static get [Symbol.species]() {
+    return this;
+  }
+
+  /**
+   * Determines if given `object` is instance of Synthetic.
    * @param {any} object
    * @returns {boolean}
    * @static
    */
-  static isSynthetic(object) {
-    if (_.isFunction(object)) object = Reflect.getPrototypeOf(object);
-    return object instanceof Synthetic;
+  static isInstance(object) {
+    if (typeof object === 'function') object = Reflect.getPrototypeOf(object);
+    return object instanceof this.constructor[Symbol.species];
   }
 
   /**
@@ -607,7 +658,7 @@ export default class Synthetic extends Serializable {
    * @static
    */
   static is(first, second) {
-    [first, second] = [first, second].map(one => Synthetic.isSynthetic(one) ? one.toMap() : one);
+    [first, second] = [first, second].map(one => typeof one.toMap === 'function' ? one.toMap() : one);
     return Immutable.is(first, second);
   }
 }

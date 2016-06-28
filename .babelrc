@@ -2,16 +2,11 @@
   "presets": ["es2015"],
   "plugins": [
     "add-module-exports",
-    "transform-function-bind",
+    "transform-runtime",
+    "transform-decorators-legacy",
     "transform-class-properties",
-    "transform-undefined-to-void",
-    "transform-object-rest-spread",
     "transform-async-to-generator",
-    ["babel-plugin-transform-builtin-extend", {
-      "globals": ["Error"]
-    }],
-    ["transform-strict-mode", {
-      "strict": true
-    }]
+    "transform-undefined-to-void",
+    "transform-strict-mode"
   ]
 }
