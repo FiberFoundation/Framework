@@ -2,7 +2,7 @@ import Synthetic from '../Foundation/Synthetic';
 import Types from '../Support/Types';
 
 /**
- * Fiber Model Schema.
+ * Model Schema.
  * @class
  * @extends {Synthetic}
  **/

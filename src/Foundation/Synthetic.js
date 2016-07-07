@@ -1,5 +1,6 @@
 import Emitter from '../Events/Emitter';
 import Path from '../Support/Path';
+import Log from './Log';
 import {Map, List} from 'immutable';
 import * as _ from 'lodash';
 
@@ -10,7 +11,7 @@ import * as _ from 'lodash';
 let Guarded = new WeakMap();
 
 /**
- * Fiber Synthetic.
+ * Synthetic.
  * @class
  * @extends {Serializable}
  **/
@@ -43,7 +44,7 @@ export default class Synthetic extends Emitter {
         return Guarded.get(this);
       },
       set: function(immutable) {
-        Guarded.set(this, immutable);
+        Guarded.set(this, this.prepareToReset(immutable));
       }
     });
   }
@@ -71,10 +72,20 @@ export default class Synthetic extends Emitter {
    * @return {Synthetic}
    */
   reset(attributes = {}) {
-    this.attributes = Map.isMap(attributes) ? attributes : Map(attributes);
-    this.onChange(this.attributes);
+    let previousAttributes = this.attributes;
+    this.fire('changing', this.attributes, previousAttributes);
+    this.attributes = this.prepareToReset(attributes);
+    this.onChanged(this.attributes, previousAttributes);
+    this.fire('changed', this.attributes, previousAttributes);
     return this;
   }
+
+  /**
+   * On attributes changed hook.
+   * @param {Immutable} newAttributes
+   * @param {Immutable} previousAttributes
+   */
+  onChanged(newAttributes, previousAttributes) {}
 
   /**
    * Returns value at a `key`.
@@ -557,7 +568,7 @@ export default class Synthetic extends Emitter {
   serializable() {
     return this.toJSON();
   }
-
+  
   /**
    * Destroys State.
    * @returns {Synthetic}
@@ -571,42 +582,25 @@ export default class Synthetic extends Emitter {
   }
 
   /**
-   * On attributes change hook.
-   * @param {Immutable} newAttributes
-   */
-  onChange(newAttributes) {}
-
-  /**
    * Creates new instance using `Symbol.species` constructor.
    * @param {...any} args
-   * @returns {Object}
+   * @returns {Synthetic|Object}
    */
   replicate(...args) {
-    const Species = this.getConstructor(Symbol.species);
+    const Species = Reflect.getOwnPropertyDescriptor(this, 'constructor')[Symbol.species];
+    if (! Species) Log.error('Cannot replicate Synthetic instance. Symbol Species is not defined.');
     return new Species(...args);
   }
 
   /**
-   * Returns Object constructor or retrieves value for the given property.
-   * @param {string|Symbol} [property]
-   * @returns {Constructor|any}
+   * Prepares attributes to reset Synthetic.
+   * @param {Immutable|Object} attributes
+   * @returns {ImmutableMap}
    */
-  getConstructor(property) {
-    const ConstructorFn = Reflect.getOwnPropertyDescriptor(this, 'constructor').value;
-    if (! property) return ConstructorFn;
-    return ConstructorFn[property];
+  prepareToReset(attributes) {
+    return Map.isMap(attributes) ? attributes : Map(attributes);
   }
-
-  /**
-   * Generator method to iterate through properties using for..of loop.
-   * @yields {[key, value]}
-   */
-  * iterator() {
-    const all = this.all();
-    const keys = Reflect.ownKeys(all);
-    for (const key of keys) yield [key, all[key]];
-  }
-
+  
   /**
    * Specifies a function valued property that is called to convert an object to a corresponding primitive value.
    * @param {string} hint
@@ -617,36 +611,6 @@ export default class Synthetic extends Emitter {
     if (hint === 'string') return this.serialize();
     else if (hint === 'number') return this.size;
     return !! this.size;
-  }
-
-  /**
-   * A string value used for the default description of an object. Used by `Object.prototype.toString()`.
-   * @returns {string}
-   * @meta
-   */
-  [Symbol.toStringTag]() {
-    return this.getConstructor('name');
-  }
-
-  /**
-   * Returns constructor function that is used to create derived objects.
-   * @returns {Constructable}
-   * @static
-   * @meta
-   */
-  static get [Symbol.species]() {
-    return this;
-  }
-
-  /**
-   * Determines if given `object` is instance of Synthetic.
-   * @param {any} object
-   * @returns {boolean}
-   * @static
-   */
-  static isInstance(object) {
-    if (typeof object === 'function') object = Reflect.getPrototypeOf(object);
-    return object instanceof this[Symbol.species];
   }
 
   /**

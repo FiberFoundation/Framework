@@ -1,23 +1,44 @@
 import State from '../Foundation/State';
+import Class from "../Foundation/Class";
 import * as _ from 'lodash';
 
 /**
- * String to determine resolvable bindings.
+ * Resolvable parameter prefix.
  * @type {string}
  */
-export const RESOLVABLE_POSTFIX = '!';
+export const RESOLVABLE_PREFIX = '$$';
 
 /**
- * Fiber Inverse Of Control Container
+ * Inverse Of Control Container
  * @class
  */
 export default class Container {
 
   /**
-   * Constructs Container
+   * Container's bindings.
+   * @type {State}
    */
-  constructor() {
-    this.flush();
+  bindings = new State();
+
+  /**
+   * Container's shared instances.
+   * @type {State}
+   */
+  instances = new State();
+
+  /**
+   * Registered aliases.
+   * @type {State}
+   */
+  aliases = new State();
+
+  /**
+   * Determines if binding is in Container.
+   * @param {string} binding
+   * @returns {boolean}
+   */
+  has(binding) {
+    return this.isBound(binding) || this.isShared(binding) || this.isAlias(binding);
   }
 
   /**
@@ -73,7 +94,6 @@ export default class Container {
    * @param {Array} [parameters=[]]
    * @param {Object} [scope=null]
    * @returns {Object}
-   * @throws Resolution Exception
    */
   make(abstract, parameters = [], scope = null) {
     abstract = this.getAbstract(abstract);
@@ -126,21 +146,8 @@ export default class Container {
    * @returns {string}
    */
   getAbstract(abstract) {
-    abstract = this.removeResolvablePostfix(abstract);
+    abstract = this.removeResolvablePrefix(abstract);
     return this.isAlias(abstract) ? this.aliases.get(abstract) : abstract;
-  }
-
-  /**
-   * Removes `RESOLVABLE_POSTFIX` from `abstract` type definition.
-   * @param {string} abstract
-   * @returns {string}
-   */
-  removeResolvablePostfix(abstract) {
-    if (abstract.charAt(abstract.length - 1) === RESOLVABLE_POSTFIX) {
-      abstract = abstract.slice(0, abstract.length - 2);
-    }
-
-    return abstract;
   }
 
   /**
@@ -150,6 +157,15 @@ export default class Container {
    */
   shared(abstract) {
     return this.instances.get(this.getAbstract(abstract));
+  }
+
+  /**
+   * Removes resolvable prefix from the `parameter`.
+   * @param {string|any} parameter
+   * @returns {string|any}
+   */
+  removeResolvablePrefix(parameter) {
+    return _.isString(parameter) ? _.trimStart(parameter, RESOLVABLE_PREFIX) : parameter;
   }
 
   /**
@@ -185,12 +201,16 @@ export default class Container {
    * @returns {boolean}
    */
   isResolvable(parameter) {
-    if (! _.isString(parameter)) return false;
+    if (! _.startsWith(parameter, RESOLVABLE_PREFIX)) return false;
+  }
 
-    if (_.endsWith(parameter, RESOLVABLE_POSTFIX)) {
-      parameter = _.trimEnd(parameter, RESOLVABLE_POSTFIX);
-    }
-
-    return this.isBound(parameter) || this.isShared(parameter) || this.isAlias(parameter);
+  /**
+   * Creates resolvable parameter or returns as is if not is string.
+   * @param {string|any} parameter
+   * @returns {string|any}
+   * @static
+   */
+  static resolvable(parameter) {
+    return _.isString(parameter) && ! this.prototype.isResolvable(parameter) ? `${RESOLVABLE_PREFIX}${parameter}` : parameter;
   }
 }

@@ -1,5 +1,5 @@
 /**
- * Fiber Framework Type.
+ * Framework Type.
  * @typedef {Object} Framework
  */
 
@@ -80,5 +80,5 @@
 
 /**
  * Immutable Type.
- * @typedef {ImmutableList|ImmutableStack|ImmutableMap|ImmutableOrderedMap|ImmutableSet|ImmutableOrderedSet}
+ * @typedef {ImmutableList|ImmutableStack|ImmutableMap|ImmutableOrderedMap|ImmutableSet|ImmutableOrderedSet|ImmutableRecord|ImmutableRecordClass} Immutable
  */

@@ -14,7 +14,7 @@ import * as Extend from './Support/Extend';
 import Immutable from 'immutable';
 
 /**
- * Fiber Framework
+ *  Framework
  * @type {Framework}
  */
 const Framework = {

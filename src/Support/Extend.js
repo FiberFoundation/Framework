@@ -17,7 +17,7 @@ export function toClass(proto = {}) {
  * @returns {Constructable}
  */
 export function Mix(...args) {
-  return toClass(Object.assign.apply(void 0, [{}].concat(args)));
+  return toClass(Object.assign.apply(void 0, [{}].concat([...args])));
 }
 
 /**

@@ -1,11 +1,13 @@
+import Traversable from "../Foundation/Traversable";
 import Serializer from './Serializer';
 import * as _ from 'lodash';
 
 /**
- * Fiber Serializable Class
+ * Serializable Class.
  * @class
+ * @extends {Traversable}
  **/
-export default class Serializable {
+export default class Serializable extends Traversable {
 
   /**
    * Hidden properties.
@@ -44,7 +46,7 @@ export default class Serializable {
   }
 
   /**
-   * Serializes Serializable to JSON string.
+   * Converts `Serializable` to JSON string.
    * @returns {string}
    */
   serialize() {
@@ -52,7 +54,7 @@ export default class Serializable {
   }
 
   /**
-   * Converts serialized JSON string to new Serializable.
+   * Converts serialized JSON string to Serializable instance.
    * @param {string} serialized
    * @returns {Serializable}
    */
@@ -69,14 +71,6 @@ export default class Serializable {
   }
 
   /**
-   * Returns all items. Alias for `toPlain()`.
-   * @returns {Object}
-   */
-  all() {
-    return this.toPlain();
-  }
-
-  /**
    * Creates new instance or mixes `this` with the `plain` object/array.
    * @type {Object}
    * @returns {Serializable}
@@ -87,11 +81,11 @@ export default class Serializable {
   }
 
   /**
-   * Returns serialized object if Serializable used in string context.
-   * @returns {string}
+   * Returns all items. Alias for `toPlain()`.
+   * @returns {Object}
    */
-  toString() {
-    return this.serialize();
+  all() {
+    return this.toPlain();
   }
 
   /**
@@ -100,5 +94,35 @@ export default class Serializable {
    */
   serializable() {
     return this;
+  }
+
+  /**
+   * A string value used for the default description of an object. Used by `Object.prototype.toString()`.
+   * @returns {string}
+   * @meta
+   */
+  [Symbol.toStringTag]() {
+    return this.serialize();
+  }
+  
+  /**
+   * Returns constructor function that is used to create derived objects.
+   * @returns {Constructable}
+   * @static
+   * @meta
+   */
+  static get [Symbol.species]() {
+    return this;
+  }
+
+  /**
+   * Determines if given `object` is instance of Synthetic.
+   * @param {any} object
+   * @returns {boolean}
+   * @static
+   */
+  static isInstance(object) {
+    if (typeof object === 'function') object = Reflect.getPrototypeOf(object);
+    return object instanceof this[Symbol.species];
   }
 }

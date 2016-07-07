@@ -1,21 +1,21 @@
-let webpack = require('webpack');
-let path = require('path');
-let args = require('yargs');
-let packageJson = require('./package.json');
+var webpack = require('webpack');
+var path = require('path');
+var args = require('yargs');
+var packageJson = require('./package.json');
 
   // Webpack plugins
-let UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
-let CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
+var UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
+var CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 
   // Build vars
-let env = args.argv.mode || 'build';
-let libraryName = 'Fiber';
-let isProd = env === 'prod-build';
-let extension = isProd ? '.min.js' : '.js';
-let outputPath = __dirname + '/dist';
+var env = args.argv.mode || 'build';
+var libraryName = 'Fiber';
+var isProd = env === 'prod-build';
+var extension = isProd ? '.min.js' : '.js';
+var outputPath = __dirname + '/dist';
 
 // Will chunk Framework and vendor into two separate files.
-let plugins = [
+var plugins = [
   new CommonsChunkPlugin('vendor', 'fiber.vendor.js', Infinity)
 ];
 

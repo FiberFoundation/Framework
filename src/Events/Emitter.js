@@ -1,6 +1,6 @@
 import Serializable from '../Serializer/Serializable';
 import {copyProperties} from '../Support/Extend';
-import Vent from './_Support';
+import Vent from '../Support/Events';
 import * as _ from 'lodash';
 
 /**
@@ -12,7 +12,7 @@ import * as _ from 'lodash';
 let Channels = new WeakMap();
 
 /**
- * Fiber Emitter.
+ * Emitter.
  * @class
  * @extends {Serializable}
  */

@@ -19,7 +19,7 @@ const ConstructionMethod = Symbol.for('@@specific');
 const toString = Object.prototype.toString;
 
 /**
- * Fiber Type Class.
+ * Type Class.
  * @class
  */
 export class Type {
@@ -136,7 +136,7 @@ export class Type {
 }
 
 /**
- * Fiber build-in Types.
+ * Known Types.
  * @type {ImmutableRecordClass|Object}
  */
 export default new (Immutable.Record({
@@ -167,15 +167,6 @@ export default new (Immutable.Record({
   /** Control abstraction objects. */
   Promise: new Type(Promise, new Promise(function() {})),
   GeneratorFunction: new Type(Object.getPrototypeOf(function*(){}).constructor, function*() {}),
-  /** Reflection. */
-  Proxy: new Type(Proxy, new Proxy({}, {})),
-  /** File API objects. */
-  Blob: new Type(Blob, new Blob([])),
-  FormData: new Type(FormData, new FormData),
-  /** WebSocket object. */
-  WebSocket: new Type(WebSocket, NotSet),
-  /** Worker API objects. */
-  Worker: new Type(Worker, new Worker('')),
   /** Immutable Types. */
   Immutable: {
     Iterable: new Type(Immutable.Iterable, Immutable.Iterable([]), Type.ConstructionMethod.CALL),

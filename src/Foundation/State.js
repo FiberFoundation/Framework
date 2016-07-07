@@ -1,7 +1,7 @@
 import Synthetic from './Synthetic';
 
 /**
- * Fiber State.
+ * State.
  * @class
  * @extends {Synthetic}
  **/

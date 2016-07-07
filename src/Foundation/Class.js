@@ -2,7 +2,7 @@ import Emitter from '../Events/Emitter';
 import * as _ from 'lodash';
 
 /**
- * Fiber Class.
+ * Base Class.
  * @class
  * @extends {Emitter}
  **/
@@ -139,5 +139,17 @@ export default class Class extends Emitter {
     super.destroy();
     this.options = {};
     return this;
+  }
+
+  /**
+   * Specifies a function valued property that is called to convert an object to a corresponding primitive value.
+   * @param {string} hint
+   * @returns {string|number|boolean}
+   * @meta
+   */
+  [Symbol.toPrimitive](hint) {
+    if (hint === 'string') return this.serialize();
+    else if (hint === 'number') return _.size(this);
+    return !! _.size(this);
   }
 }

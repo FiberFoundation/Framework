@@ -8,7 +8,7 @@ import Schema from './Schema';
 const SchemaSymbol = Symbol.for('@@schema');
 
 /**
- * Fiber Model.
+ * Model.
  * @class
  * @extends {Synthetic}
  */
