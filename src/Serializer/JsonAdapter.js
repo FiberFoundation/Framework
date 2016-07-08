@@ -1,19 +1,24 @@
-import SerializeAdapter from '../Contracts/SerializeAdapter';
+/* @flow */
 import * as _ from 'lodash';
 
 /**
  * JSON Serialize Adapter.
  * @class
- * @extends {SerializeAdapter}
+ * @implement SerializeAdapter
  */
-export default class JsonAdapter extends SerializeAdapter {
+export default class JsonAdapter {
+  
+  /**
+   * Options
+   * @type {Object}
+   */
+  options: Object;
 
   /**
    * Constructs JSON Serialize Adapter.
    * @param {Object} [options={}]
    */
-  constructor(options = {}) {
-    super();
+  constructor(options: Object = {}) {
     this.options = _.defaults(options, {replacer: void 0, space: void 0, reviver: void 0});
   }
 
@@ -23,7 +28,7 @@ export default class JsonAdapter extends SerializeAdapter {
    * @returns {string}
    * @override
    */
-  serialize(object) {
+  serialize(object: Object): string {
     return JSON.stringify(object, this.options.replacer, this.options.space);
   }
 
@@ -33,7 +38,7 @@ export default class JsonAdapter extends SerializeAdapter {
    * @returns {Object}
    * @override
    */
-  unserialize(string) {
+  unserialize(string: string): Object {
     return JSON.parse(string, this.options.reviver);
   }
 }

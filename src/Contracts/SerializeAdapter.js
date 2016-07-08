@@ -1,26 +1,22 @@
-import Contract from "./Contract";
+/* @flow */
 
 /**
  * Serializer Adapter Contract.
- * @class
  * @interface
- * @implement Contract
  */
-export default class SerializeAdapter extends Contract {
-  
+declare interface SerializeAdapter {
+
   /**
    * Returns `object` converted to string.
    * @param {Object} object
    * @returns {string}
-   * @abstract
    */
-  serialize(object) {}
+  serialize(object: Object): string;
 
   /**
    * Returns object parsed from `string`.
    * @param {string} string
    * @returns {Object}
-   * @abstract
    */
-  unserialize(string) {}
+  unserialize(string: string): Object;
 }

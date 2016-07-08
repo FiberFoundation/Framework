@@ -1,3 +1,5 @@
+/* @flow */
+import {Iterable} from 'immutable';
 import Synthetic from './Synthetic';
 
 /**
@@ -12,7 +14,7 @@ export default class State extends Synthetic {
    * @param {Object|Immutable} [attributes]
    * @param {Object} [options={}]
    */
-  constructor(attributes, options) {
+  constructor(attributes: Object|typeof Iterable, options: Object) {
     super(attributes, options);
     this.guard();
   }

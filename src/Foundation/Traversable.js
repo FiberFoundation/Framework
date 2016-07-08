@@ -1,27 +1,32 @@
-import Traverse from "../Contracts/Traverse";
+/* @flow */
+import * as _ from 'lodash';
 
 /**
  * Traversable.
  * @class
- * @implement Traverse
  */
-export default class Traversable extends Traverse {
+export default class Traversable {
 
   /**
-   * Returns all items.
+   * Returns traversable object.
    * @returns {Object}
    */
-  all() {
+  traversable() {
     return this;
   }
-  
+
   /**
    * Generator method to iterate through properties using for..of loop.
    * @yields {[key, value]}
    */
-  * iterator() {
-    const all = this.all();
-    const keys = Reflect.ownKeys(all);
-    for (const key of keys) yield [key, all[key]];
+  [Symbol.iterator](): Generator<Array<any>, any, any> {
+    let all = this.traversable();
+    let traversable = all;
+
+    if (_.isObject(all) && ! _.isArray(all)) {
+      traversable = Reflect.ownKeys(all);
+    }
+
+    for (const one of traversable) yield [one, all[one]];
   }
 }

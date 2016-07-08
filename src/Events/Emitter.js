@@ -1,3 +1,4 @@
+/* @flow */
 import Serializable from '../Serializer/Serializable';
 import {copyProperties} from '../Support/Extend';
 import Vent from '../Support/Events';
@@ -9,7 +10,7 @@ import * as _ from 'lodash';
  * @type {WeakMap}
  * @private
  */
-let Channels = new WeakMap();
+let Channels: WeakMap = new WeakMap();
 
 /**
  * Emitter.
@@ -22,25 +23,25 @@ export default class Emitter extends Serializable {
    * Emitter Namespace.
    * @type {string}
    */
-  ns = '';
+  ns: string = '';
 
   /**
    * Events catalog.
    * @type {Object}
    */
-  catalog = {};
+  catalog: Object = {};
 
   /**
    * Flag to enable/disable events to trigger.
    * @type {boolean}
    */
-  allowedToEmit = true;
+  allowedToEmit: boolean = true;
 
   /**
    * Constructs Events.
    * @param {Object} [options={ns:'',catalog:{}}] - Options object.
    */
-  constructor(options = {ns: '', catalog: {}}) {
+  constructor(options: Object = {ns: '', catalog: {}}) {
     super(options);
     this.options = _.clone(options);
     this.resetNsAndCatalog(options);
@@ -53,7 +54,7 @@ export default class Emitter extends Serializable {
    * @param {Object} [listenable=null]
    * @returns {string}
    */
-  event(event, listenable = null) {
+  event(event: string, listenable: ?Object = null): string {
     if (! event) return '';
     if (listenable && _.isFunction(listenable.event)) return listenable.event(event);
     // try to retrieve event from catalog
@@ -70,7 +71,7 @@ export default class Emitter extends Serializable {
    * @param {...any} args
    * @returns {Emitter}
    */
-  trigger(event, ...args) {
+  trigger(event: string, ...args: any): this {
     if (! this.allowedToEmit) return this;
     return Vent.trigger.apply(this, arguments);
   }
@@ -81,7 +82,7 @@ export default class Emitter extends Serializable {
    * @param {...any} args
    * @returns {Emitter}
    */
-  fire(event, ...args) {
+  fire(event: string, ...args: any): this {
     return this.trigger.apply(this, [this.event(event)].concat(...args));
   }
 
@@ -93,7 +94,7 @@ export default class Emitter extends Serializable {
    * @param {Object} [scope]
    * @returns {Emitter}
    */
-  on(event, listener, scope) {
+  on(event: string, listener: Function, scope: ?Object): this {
     return this.when(this, event, listener, scope);
   }
 
@@ -107,7 +108,7 @@ export default class Emitter extends Serializable {
    * @param {Object} [scope]
    * @returns {Emitter}
    */
-  once(event, listener, scope) {
+  once(event: string, listener: Function, scope: ?Object): this {
     return this.after(this, event, listener, scope);
   }
 
@@ -121,7 +122,7 @@ export default class Emitter extends Serializable {
    * @param {Object} [scope]
    * @returns {Emitter}
    */
-  when(object, event, listener, scope) {
+  when(object: Object|Emitter|string, event: string|Function, listener: Function|Object, scope: ?Object): this {
     if (_.isString(object)) [listener, event, object] = [event, object, this];
     return Vent.listenTo.call(
       this, object, this.event(event, object), this.createEventListener(listener, scope)
@@ -136,7 +137,7 @@ export default class Emitter extends Serializable {
    * @param {Object} [scope]
    * @returns {Emitter}
    */
-  after(object, event, listener, scope) {
+  after(object: Object|Emitter|string, event: string|Function, listener: Function|Object, scope: ?Object): this {
     if (_.isString(object)) [listener, event, object] = [event, object, this];
     return Vent.listenToOnce.call(
       this, object, this.event(event, object), this.createEventListener(listener, scope)
@@ -154,7 +155,7 @@ export default class Emitter extends Serializable {
    * @param {Object} [scope]
    * @returns {Emitter}
    */
-  off(object, event, listener, scope) {
+  off(object: Object|Emitter|string, event: string|Function, listener: Function|Object, scope: ?Object): this {
     if (_.isString(object)) [listener, event, object] = [event, object, this];
     return Vent.stopListening.call(
       this, object, (event && this.event(event, object) || void 0), this.createEventListener(listener, scope)
@@ -167,7 +168,7 @@ export default class Emitter extends Serializable {
    * @param {...any} args
    * @returns {Emitter}
    */
-  broadcast(event, ...args) {
+  broadcast(event: string, ...args: any): this {
     Broadcast.fire.apply(Broadcast, arguments);
     return this;
   }
@@ -180,7 +181,7 @@ export default class Emitter extends Serializable {
    * @param {Object} [scope]
    * @returns {Emitter}
    */
-  whenBroadcast(event, listener, scope) {
+  whenBroadcast(event: string, listener: Function, scope: ?Object): this {
     Broadcast.when(event, listener, scope);
     return this;
   }
@@ -193,7 +194,7 @@ export default class Emitter extends Serializable {
    * @param {Object} [scope]
    * @returns {Emitter}
    */
-  afterBroadcast(event, listener, scope) {
+  afterBroadcast(event: string, listener: Function, scope: ?Object): this {
     Broadcast.after(event, listener, scope);
     return this;
   }
@@ -207,7 +208,7 @@ export default class Emitter extends Serializable {
    * @param {Object} [scope]
    * @returns {Emitter}
    */
-  stopBroadcast(event, listener, scope) {
+  stopBroadcast(event: string, listener: Function, scope: ?Object): this {
     Broadcast.off(event, listener, scope);
     return this;
   }
@@ -217,7 +218,7 @@ export default class Emitter extends Serializable {
    * @param {string} name
    * @returns {Emitter}
    */
-  channel(name) {
+  channel(name: string): Emitter {
     if (! Channels.has(this)) Channels.set(this, {});
     let storage = Channels.get(this) || {}
       , channel = storage[name];
@@ -235,9 +236,9 @@ export default class Emitter extends Serializable {
    * Creates and returns function that will call listener with the right scope.
    * @param {Function} cb
    * @param {Object} [scope]
-   * @returns {FiberEventListener|void}
+   * @returns {Function|void}
    */
-  createEventListener(cb, scope) {
+  createEventListener(cb: Function, scope: ?Object): Function|void {
     if (! _.isFunction(cb)) return void 0;
     return function FiberEventListener() {
       return cb.apply(scope || cb.prototype || cb, arguments);
@@ -249,7 +250,7 @@ export default class Emitter extends Serializable {
    * @param {Object} [options]
    * @returns {Emitter}
    */
-  resetNsAndCatalog(options = {ns: '', catalog: {}}) {
+  resetNsAndCatalog(options: Object = {ns: '', catalog: {}}): this {
     this.ns = options.ns || '';
     this.catalog = options.catalog || {};
     return this;
@@ -259,16 +260,12 @@ export default class Emitter extends Serializable {
    * Unbounds and clears all events.
    * @returns {Emitter}
    */
-  destroy() {
+  destroy(): this {
     this.off();
-
-    try {
-      delete this._listeningTo;
-      delete this._listeners;
-      delete this._listenId;
-      delete this._events;
-    } catch (e) {}
-
+    delete this._listeningTo;
+    delete this._listeners;
+    delete this._listenId;
+    delete this._events;
     return this;
   }
 
@@ -276,7 +273,7 @@ export default class Emitter extends Serializable {
    * Unbounds and clears all Global events.
    * @returns {Emitter}
    */
-  destroyBroadcastEvents() {
+  destroyBroadcastEvents(): this {
     Broadcast.destroy();
     return this;
   }
@@ -287,7 +284,7 @@ export default class Emitter extends Serializable {
    * @returns {Emitter}
    * @static
    */
-  static make(options) {
+  static make(options: ?Object): Emitter {
     return new Emitter(options);
   }
 
@@ -295,7 +292,7 @@ export default class Emitter extends Serializable {
    * Returns Emitter as plain object.
    * @returns {Object}
    */
-  static asObject() {
+  static asObject(): Object {
     return copyProperties({}, new Emitter);
   }
 
@@ -305,7 +302,7 @@ export default class Emitter extends Serializable {
    * @returns {boolean}
    * @static
    */
-  static isEmitter(object) {
+  static isEmitter(object: any): boolean {
     if (_.isFunction(object)) object = Reflect.getPrototypeOf(object);
     return object instanceof Emitter;
   }
@@ -315,7 +312,7 @@ export default class Emitter extends Serializable {
  * Global Broadcast.
  * @type {Emitter}
  */
-const Broadcast = new Emitter();
+const Broadcast: Emitter = new Emitter();
 
 /** Cache reference for the Global Broadcast. */
 Emitter.Broadcast = Broadcast;

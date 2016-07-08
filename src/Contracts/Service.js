@@ -1,31 +1,29 @@
-import Contract from "./Contract";
+/* @flow */
 
 /**
  * Service Contract.
- * @class
  * @interface
- * @implement Contract
  **/
-export default class Service extends Contract {
+declare interface Service {
 
   /**
    * Bootstraps the Service.
    * @returns {Service}
    * @abstract
    */
-  init() {}
+  init(): Service;
 
   /**
    * Runs the Service.
    * @returns {Service}
    * @abstract
    */
-  run() {}
+  run(): Service;
 
   /**
    * Stops and destroys the Service.
    * @returns {Service}
    * @abstract
    */
-  terminate() {}
+  terminate(): Service;
 }

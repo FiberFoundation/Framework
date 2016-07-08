@@ -1,4 +1,5 @@
-import Traversable from "../Foundation/Traversable";
+/* @flow */
+import Traversable from '../Foundation/Traversable';
 import Serializer from './Serializer';
 import * as _ from 'lodash';
 
@@ -12,35 +13,42 @@ export default class Serializable extends Traversable {
   /**
    * Hidden properties.
    * Will be omitted on serialization.
-   * @type {Array.<string>}
+   * @type {Array<string>}
    */
-  hidden = ['serializer', 'hidden'];
+  hidden: Array<string> = ['serializer', 'hidden'];
 
   /**
-   * Constructs Fiber Serializable.
+   * Serializer instance.
+   * @type {Serializer}
+   */
+  serializer: Serializer;
+
+  /**
+   * Constructs Serializable.
    * @param {Object} [options={}]
    */
-  constructor(options = {}) {
+  constructor(options: Object = {}) {
+    super();
     if (options.hidden) this.markAsHidden(options.hidden);
     this.serializer = new Serializer(options.serializer);
   }
 
   /**
    * Marks property as `hidden` to avoid it to be serialized.
-   * @param {string|Array.<string>} hidden
+   * @param {string|Array<string>} hidden
    * @returns {Serializable}
    */
-  markAsHidden(hidden) {
+  markAsHidden(hidden: string|Array<string>): this {
     this.hidden = _.uniq(this.hidden.concat(_.castArray(hidden)));
     return this;
   }
 
   /**
    * Marks property as `visible` to allow to serialize it.
-   * @param {string|Array.<string>} visible
+   * @param {string|Array<string>} visible
    * @returns {Serializable}
    */
-  markAsVisible(visible) {
+  markAsVisible(visible: string|Array<string>): this {
     this.hidden = _.difference(this.hidden, _.castArray(visible));
     return this;
   }
@@ -49,7 +57,7 @@ export default class Serializable extends Traversable {
    * Converts `Serializable` to JSON string.
    * @returns {string}
    */
-  serialize() {
+  serialize(): string {
     return this.serializer.serialize(this.toPlain());
   }
 
@@ -58,7 +66,7 @@ export default class Serializable extends Traversable {
    * @param {string} serialized
    * @returns {Serializable}
    */
-  fromSerialized(serialized) {
+  fromSerialized(serialized: string): this {
     return this.fromPlain(this.serializer.unserialize(serialized));
   }
 
@@ -66,7 +74,7 @@ export default class Serializable extends Traversable {
    * Converts to Plain object or Array.
    * @returns {Object}
    */
-  toPlain() {
+  toPlain(): Object {
     return _.omit(this.serializable(), this.hidden);
   }
 
@@ -75,7 +83,7 @@ export default class Serializable extends Traversable {
    * @type {Object}
    * @returns {Serializable}
    */
-  fromPlain(plain) {
+  fromPlain(plain: Object): Object {
     _.extend(this.serializable(), plain);
     return this;
   }
@@ -84,7 +92,7 @@ export default class Serializable extends Traversable {
    * Returns all items. Alias for `toPlain()`.
    * @returns {Object}
    */
-  all() {
+  all(): Object {
     return this.toPlain();
   }
 
@@ -92,7 +100,7 @@ export default class Serializable extends Traversable {
    * Returns object that will be serialized and used in `toPlain()` and `fromPlain()` methods.
    * @returns {Object}
    */
-  serializable() {
+  serializable(): Object {
     return this;
   }
 
@@ -101,17 +109,17 @@ export default class Serializable extends Traversable {
    * @returns {string}
    * @meta
    */
-  [Symbol.toStringTag]() {
+  [Symbol.toStringTag](): string {
     return this.serialize();
   }
-  
+
   /**
    * Returns constructor function that is used to create derived objects.
    * @returns {Constructable}
    * @static
    * @meta
    */
-  static get [Symbol.species]() {
+  static get [Symbol.species](): Object {
     return this;
   }
 
@@ -121,7 +129,7 @@ export default class Serializable extends Traversable {
    * @returns {boolean}
    * @static
    */
-  static isInstance(object) {
+  static isInstance(object: any): boolean {
     if (typeof object === 'function') object = Reflect.getPrototypeOf(object);
     return object instanceof this[Symbol.species];
   }

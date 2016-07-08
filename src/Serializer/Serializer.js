@@ -1,4 +1,4 @@
-import SerializeAdapter from '../Contracts/SerializeAdapter';
+/* @flow */
 import JsonAdapter from './JsonAdapter';
 import Log from '../Foundation/Log';
 
@@ -16,22 +16,17 @@ const DefaultAdapter = new JsonAdapter();
 export default class Serializer {
 
   /**
-   * Adapters.
-   * @type {Object}
-   * @static
+   * Adapter instance.
+   * @type {SerializeAdapter}
    */
-  static Adapters = {
-    Json: JsonAdapter
-  };
+  adapter: SerializeAdapter;
 
   /**
    * Constructs Serializer.
    * @param {SerializeAdapter} [adapter=JsonAdapter]
    */
-  constructor(adapter = DefaultAdapter) {
-    if (adapter instanceof SerializeAdapter) {
-      this.adapter = adapter;
-    }
+  constructor(adapter: SerializeAdapter = DefaultAdapter) {
+    this.adapter = adapter;
   }
 
   /**
@@ -39,7 +34,7 @@ export default class Serializer {
    * @param {Object} object
    * @returns {string}
    */
-  serialize(object) {
+  serialize(object: Object): string {
     return this.callAdapter('serialize', object);
   }
 
@@ -48,7 +43,7 @@ export default class Serializer {
    * @param {string} string
    * @returns {Object}
    */
-  unserialize(string) {
+  unserialize(string: string): Object {
     return this.callAdapter('unserialize', string);
   }
 
@@ -58,7 +53,7 @@ export default class Serializer {
    * @param {...any} args
    * @returns {any}
    */
-  callAdapter(method, ...args) {
+  callAdapter(method: string, ...args: any): any {
     try {
       var converted = this.adapter[method](...args);
     } catch (e) {

@@ -1,3 +1,5 @@
+/* @flow */
+
 import Emitter from '../Events/Emitter';
 import * as _ from 'lodash';
 
@@ -9,10 +11,16 @@ import * as _ from 'lodash';
 export default class Class extends Emitter {
 
   /**
+   * Options.
+   * @type {Object}
+   */
+  options: Object;
+
+  /**
    * Constructs Fiber Object.
    * @param {Object} [options={}]
    */
-  constructor(options = {}) {
+  constructor(options?: Object = {}) {
     super(options);
     this.options = _.clone(options);
   }
@@ -23,7 +31,7 @@ export default class Class extends Emitter {
    * @param {any} [defaults]
    * @returns {any}
    */
-  get(key, defaults) {
+  get(key: string, defaults?: any): any {
     return _.get(this, key, defaults);
   }
 
@@ -33,7 +41,7 @@ export default class Class extends Emitter {
    * @param {any} value
    * @returns {Class}
    */
-  set(key, value) {
+  set(key: string, value: any): this {
     _.set(this, key, value);
     return this;
   }
@@ -43,7 +51,7 @@ export default class Class extends Emitter {
    * @param {string} key
    * @returns {boolean}
    */
-  has(key) {
+  has(key: string): boolean {
     return _.has(this, key);
   }
 
@@ -52,7 +60,7 @@ export default class Class extends Emitter {
    * @param {string} key
    * @returns {any}
    */
-  forget(key) {
+  forget(key: string): any {
     let result = this.get(key);
     _.unset(this, key);
     return result;
@@ -64,23 +72,23 @@ export default class Class extends Emitter {
    * @param {any} [defaults]
    * @returns {any}
    */
-  retrieve(key, defaults) {
+  retrieve(key: string, defaults: ?any): any {
     return _.result(this, key, defaults);
   }
 
   /**
    * Returns all own keys.
-   * @returns {Array}
+   * @returns {Array<string>}
    */
-  keys() {
+  keys(): Array<string> {
     return _.keys(this);
   }
 
   /**
    * Returns all own values.
-   * @returns {Array}
+   * @returns {Array<any>}
    */
-  values() {
+  values(): Array<any> {
     return _.values(this);
   }
 
@@ -88,25 +96,25 @@ export default class Class extends Emitter {
    * Returns array with own keys and own values.
    * @returns {Array}
    */
-  entries() {
+  entries(): Array<any> {
     return [this.keys(), this.values()];
   }
 
   /**
    * Returns an object composed of the picked object `keys`.
-   * @param {string|Array.<string>} keys
-   * @returns {Array}
+   * @param {string|Array<string>} keys
+   * @returns {Object}
    */
-  pick(keys) {
+  pick(keys: string|Array<string>): Object {
     return _.pick(this, keys);
   }
 
   /**
    * Returns an object with all keys that are not omitted.
-   * @param {string|Array.<string>} keys
+   * @param {string|Array<string>} keys
    * @returns {Object}
    */
-  omit(keys) {
+  omit(keys: string|Array<string>): Object {
     return _.omit(this, keys);
   }
 
@@ -115,7 +123,7 @@ export default class Class extends Emitter {
    * @param {Object} object
    * @returns {Class}
    */
-  merge(object) {
+  merge(object: Object): this {
     _.merge(this, object);
     return this;
   }
@@ -125,7 +133,7 @@ export default class Class extends Emitter {
    * @param {Object} mixin
    * @returns {Class}
    */
-  mix(mixin) {
+  mix(mixin: Object): this {
     _.extend(this, mixin);
     return this;
   }
@@ -135,7 +143,7 @@ export default class Class extends Emitter {
    * @returns {Class}
    * @override
    */
-  destroy() {
+  destroy(): this {
     super.destroy();
     this.options = {};
     return this;
@@ -147,9 +155,9 @@ export default class Class extends Emitter {
    * @returns {string|number|boolean}
    * @meta
    */
-  [Symbol.toPrimitive](hint) {
+  [Symbol.toPrimitive](hint: string): string|number|boolean {
     if (hint === 'string') return this.serialize();
-    else if (hint === 'number') return _.size(this);
+    if (hint === 'number') return _.size(this);
     return !! _.size(this);
   }
 }
