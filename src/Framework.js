@@ -1,5 +1,5 @@
 import Serializer from './Serializer/Serializer';
-import Serializable from './Serializer/Serializable';
+import Serializable from './Foundation/Serializable';
 import Emitter from './Events/Emitter';
 import Class from './Foundation/Class';
 import Synthetic from './Foundation/Synthetic';

@@ -35,7 +35,7 @@ export default class Serializer {
    * @returns {string}
    */
   serialize(object: Object): string {
-    return this.callAdapter('serialize', object);
+    return this.adapter.serialize(object);
   }
 
   /**
@@ -44,21 +44,6 @@ export default class Serializer {
    * @returns {Object}
    */
   unserialize(string: string): Object {
-    return this.callAdapter('unserialize', string);
-  }
-
-  /**
-   * Calls Adapter method to convert from/to JSON representation.
-   * @param {string} method
-   * @param {...any} args
-   * @returns {any}
-   */
-  callAdapter(method: string, ...args: any): any {
-    try {
-      var converted = this.adapter[method](...args);
-    } catch (e) {
-      Log.error(`[Serializer]: Cannot call adapter with the given arguments.`, method, args, e);
-    }
-    return converted;
+    return this.adapter.unserialize(string);
   }
 }

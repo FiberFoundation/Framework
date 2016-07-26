@@ -9,6 +9,8 @@
     "dev": "npm run build -- --progress --colors --watch",
     "start": "npm run serve",
     "test": "jest",
+    "check": "flow",
+    "check:all": "flow check --all",
     "clean": "rm -rf ./dist && rm -rf ./docs",
     "example": "webpack-dev-server --mode=test --inline --content-base ./examples",
     "example:hot": "npm run serve -- --hot",

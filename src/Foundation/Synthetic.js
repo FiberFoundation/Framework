@@ -1,3 +1,4 @@
+/* @flow */
 import Emitter from '../Events/Emitter';
 import Path from '../Support/Path';
 import Log from './Log';
@@ -8,7 +9,7 @@ import * as _ from 'lodash';
  * Container to hold guarded Synthetic Collection attributes.
  * @type {WeakMap}
  */
-let Guarded = new WeakMap();
+let Guarded: WeakMap = new WeakMap();
 
 /**
  * Synthetic.
@@ -18,11 +19,23 @@ let Guarded = new WeakMap();
 export default class Synthetic extends Emitter {
 
   /**
+   * Immutable attributes.
+   * @type {ImmutableMap}
+   */
+  attributes: Map;
+
+  /**
+   * Passed Options.
+   * @type {Object}
+   */
+  options: Object;
+
+  /**
    * Constructs Synthetic Collection.
    * @param {Object|Immutable} [attributes]
    * @param {Object} [options={}]
    */
-  constructor(attributes, options = {}) {
+  constructor(attributes: Object|Immutable, options: ?Object = {}) {
     super(options);
     this.reset(attributes);
     this.options = _.clone(options);
@@ -33,7 +46,7 @@ export default class Synthetic extends Emitter {
    * Once `guard()` is called, you cannot configure `attributes` descriptor.
    * @returns {boolean}
    */
-  guard() {
+  guard(): this {
     if (this.hasOwnProperty('attributes')) {
       Guarded.set(this, this.attributes);
       delete this.attributes;
@@ -53,7 +66,7 @@ export default class Synthetic extends Emitter {
    * Returns current Collection size.
    * @returns {number}
    */
-  get size() {
+  get size(): number {
     return this.attributes.size;
   }
 
@@ -62,7 +75,7 @@ export default class Synthetic extends Emitter {
    * Internally will call `take()` and reset with the result.
    * @param {number} newSize
    */
-  set size(newSize) {
+  set size(newSize: number) {
     this.reset(this.attributes.take(newSize));
   }
 
@@ -71,7 +84,7 @@ export default class Synthetic extends Emitter {
    * @param {Object} [attributes={}]
    * @return {Synthetic}
    */
-  reset(attributes = {}) {
+  reset(attributes: Object = {}): this {
     let previousAttributes = this.attributes;
     this.fire('changing', this.attributes, previousAttributes);
     this.attributes = this.prepareToReset(attributes);
@@ -85,7 +98,7 @@ export default class Synthetic extends Emitter {
    * @param {Immutable} newAttributes
    * @param {Immutable} previousAttributes
    */
-  onChanged(newAttributes, previousAttributes) {}
+  onChanged(newAttributes: Immutable, previousAttributes: Immutable) {}
 
   /**
    * Returns value at a `key`.
@@ -93,7 +106,7 @@ export default class Synthetic extends Emitter {
    * @param {any} [defaults]
    * @returns {any}
    */
-  get(key, defaults) {
+  get(key: string, defaults: any): any {
     if (! arguments.length) return this.attributes;
     return Path.is(key) ? this.attributes.getIn(Path.to(key), defaults) : this.attributes.get(key, defaults);
   }
@@ -105,7 +118,7 @@ export default class Synthetic extends Emitter {
    * @param {any} [value]
    * @returns {Synthetic}
    */
-  set(key, value) {
+  set(key: string|Object|Map|any, value: any): this {
     if (arguments.length === 1) return this.reset(this.attributes.mergeDeep(key));
     if (Path.is(key)) return this.reset(this.attributes.setIn(Path.to(key), value));
     return this.reset(this.attributes.set(key, value));
@@ -113,19 +126,19 @@ export default class Synthetic extends Emitter {
 
   /**
    * Determines if given `key` is in attributes.
-   * @param {string|any} key
+   * @param {string|Array} key
    * @returns {boolean}
    */
-  has(key) {
+  has(key: string|Array): boolean {
     return Path.is(key) ? this.attributes.hasIn(Path.to(key)) : this.attributes.has(key);
   }
 
   /**
    * Deletes value at a `key`.
-   * @param {string|any} key
+   * @param {string|Array} key
    * @returns {any}
    */
-  forget(key) {
+  forget(key: string|Array): any {
     let value = this.get(key);
     if (Path.isNot(key)) this.reset(this.attributes.delete(key));
     else this.reset(this.attributes.deleteIn(Path.to(key)));
@@ -143,7 +156,7 @@ export default class Synthetic extends Emitter {
    * @param {Function} mutator
    * @returns {Synthetic}
    */
-  mutate(mutator) {
+  mutate(mutator: Function): this {
     return this.reset(this.attributes.withMutations(mutator));
   }
 
@@ -151,7 +164,7 @@ export default class Synthetic extends Emitter {
    * Returns all keys as Immutable List.
    * @returns {ImmutableList}
    */
-  keys() {
+  keys(): List {
     return List(this.attributes.keys());
   }
 
@@ -159,16 +172,16 @@ export default class Synthetic extends Emitter {
    * Returns all values as Immutable List.
    * @returns {ImmutableList}
    */
-  values() {
+  values(): List {
     return List(this.attributes.values());
   }
 
   /**
    * Returns all keys and values in a single Immutable List.
-   * @returns {ImmutableList}
+   * @returns {Iterator}
    */
-  entries() {
-    return List(this.attributes.entries());
+  entries(): Iterator {
+    return this.attributes.entries();
   }
 
   /**
@@ -178,7 +191,7 @@ export default class Synthetic extends Emitter {
    * @param {any|Function} [updater]
    * @returns {Synthetic}
    */
-  update(key, updater) {
+  update(key: string|Function, updater: ?Function|any): this {
     if (Path.isNot(key)) return this.reset(this.attributes.update(key, updater));
     return this.reset(this.attributes.updateIn(Path.to(key), updater));
   }
@@ -187,7 +200,7 @@ export default class Synthetic extends Emitter {
    * Flushes Synthetic Collection.
    * @returns {Synthetic}
    */
-  flush() {
+  flush(): this {
     return this.reset(this.attributes.clear());
   }
 
@@ -195,7 +208,7 @@ export default class Synthetic extends Emitter {
    * Clones Synthetic Collection.
    * @returns {Synthetic}
    */
-  clone() {
+  clone(): Synthetic {
     return this.replicate(this.toPlain(), this.options);
   }
 
@@ -206,7 +219,7 @@ export default class Synthetic extends Emitter {
    * @param {Object|ImmutableMap} object
    * @returns {Synthetic}
    */
-  merge(object) {
+  merge(object: Object|Map): this {
     this.reset(this.attributes.merge(object));
     return this;
   }
@@ -568,7 +581,7 @@ export default class Synthetic extends Emitter {
   serializable() {
     return this.toJSON();
   }
-  
+
   /**
    * Destroys State.
    * @returns {Synthetic}
@@ -588,7 +601,7 @@ export default class Synthetic extends Emitter {
    */
   replicate(...args) {
     const Species = Reflect.getOwnPropertyDescriptor(this, 'constructor')[Symbol.species];
-    if (! Species) Log.error('Cannot replicate Synthetic instance. Symbol Species is not defined.');
+    if (! Species) Log.error('Cannot replicate Synthetic instance. Symbol `Species` is not defined.');
     return new Species(...args);
   }
 
@@ -600,7 +613,7 @@ export default class Synthetic extends Emitter {
   prepareToReset(attributes) {
     return Map.isMap(attributes) ? attributes : Map(attributes);
   }
-  
+
   /**
    * Specifies a function valued property that is called to convert an object to a corresponding primitive value.
    * @param {string} hint

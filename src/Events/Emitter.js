@@ -1,5 +1,4 @@
-/* @flow */
-import Serializable from '../Serializer/Serializable';
+import Serializable from '../Foundation/Serializable';
 import {copyProperties} from '../Support/Extend';
 import Vent from '../Support/Events';
 import * as _ from 'lodash';
@@ -294,17 +293,6 @@ export default class Emitter extends Serializable {
    */
   static asObject(): Object {
     return copyProperties({}, new Emitter);
-  }
-
-  /**
-   * Determines if given `object` is Emitter.
-   * @param {any} object
-   * @returns {boolean}
-   * @static
-   */
-  static isEmitter(object: any): boolean {
-    if (_.isFunction(object)) object = Reflect.getPrototypeOf(object);
-    return object instanceof Emitter;
   }
 };
 

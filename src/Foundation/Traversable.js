@@ -1,11 +1,11 @@
 /* @flow */
-import * as _ from 'lodash';
+import Species from "./Species";
 
 /**
  * Traversable.
  * @class
  */
-export default class Traversable {
+export default class Traversable extends Species {
 
   /**
    * Returns traversable object.
@@ -19,14 +19,12 @@ export default class Traversable {
    * Generator method to iterate through properties using for..of loop.
    * @yields {[key, value]}
    */
-  [Symbol.iterator](): Generator<Array<any>, any, any> {
+  * [Symbol.iterator](): Generator<Array<any>, any, any> {
     let all = this.traversable();
-    let traversable = all;
+    let traversable = Reflect.ownKeys(all);
 
-    if (_.isObject(all) && ! _.isArray(all)) {
-      traversable = Reflect.ownKeys(all);
+    for (const key of traversable) {
+      yield [key, all[key]];
     }
-
-    for (const one of traversable) yield [one, all[one]];
   }
 }
